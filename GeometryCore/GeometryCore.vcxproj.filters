@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\AABB.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GeometryCoreExecEnvironment.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LinearAlgebra.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LineSegment.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Matrix.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Point.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Polygon.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Triangle.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Units.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SVGWriter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AABB.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GeometryCoreExecEnvironment.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LinearAlgebra.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Polygon.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SVGWriter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Units.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
