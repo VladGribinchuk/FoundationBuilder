@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <sstream>
 
 // Simple class for unit testing.
 // For test cases instantiating use macro
@@ -19,18 +20,29 @@ public:
     class TestCase
     {
     public:
+        TestCase() { reset(); }
+
         virtual void run() = 0;
-        
+
         // Check if actual is equal to expected, if not - report test failure with message msg.
         template<typename T>
-        void CHECK(T&& actual, T&& expected, std::string msg = std::string("")) { check = true;  if (actual != expected) throw TestFailure{ msg }; }
+        void TEST_CHECK(T&& actual, T&& expected, std::string msg = std::string("")) { check = true;  if (actual != expected) throw TestFailure{ msg }; }
 
         // Check if cond is true, if not - report test failure with message msg.
-        void ASSERT(bool cond, std::string msg = std::string("")) { check = true;  if (!cond) throw TestFailure{ msg }; }
-    
+        void TEST_ASSERT(bool cond, std::string msg = std::string("")) { check = true;  if (!cond) throw TestFailure{ msg }; }
+
         bool hasAnyCheck() const { return check; }
+
+        bool hasOutput() const { return !outputBuffer.str().empty(); }
+        std::string getOutput() const { return outputBuffer.str(); }
+
+        void reset() { check = false; outputBuffer.str(""); }
+
+    protected:
+        std::ostream& TEST_OUTPUT() { return outputBuffer; };
     private:
-        bool check = false;
+        bool check;
+        std::stringstream outputBuffer;
     };
 
     void add(std::string testName, TestCase* test) { testCases[testName] = test; }
@@ -60,4 +72,9 @@ void test ::run()
 #define RUN_ALL_TESTS() \
 do { \
     globUnitTests.run(); \
+} while (0)
+
+#define RUN_ALL_TESTS_AND_OUTPUT_RESULTS_TO(stream) \
+do { \
+    globUnitTests.run(stream); \
 } while (0)

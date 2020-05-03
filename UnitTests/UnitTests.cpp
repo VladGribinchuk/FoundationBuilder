@@ -44,30 +44,54 @@ void UnitTests::run(std::ostream& stream)
     if (testCases.empty())
         return;
 
+    // Reset internal states of all test cases before running.
+    for (auto& test : testCases)
+        test.second->reset();
+
+    std::stringstream bufStream;
+
     std::vector<double> totalt;
     std::size_t failed = 0;
+    std::size_t num = 1;
+
+    bufStream << "[ # ] [Test case name]    [Result] [Time elapsed]\n";
     for (auto& testPair : testCases)
     {
-        stream << "Running " << Align(testPair.first, 20)();
+        std::string start;
+        start += "[";
+        start += std::to_string(num++);
+        start += "]";
+        bufStream << Align(start, 5)() << " " << Align(testPair.first, 20)();
         try {
             auto t1 = std::chrono::high_resolution_clock::now();
             testPair.second->run();
             auto t2 = std::chrono::high_resolution_clock::now();
             double ms = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
             totalt.push_back(ms);
-            stream << "[  OK  ]: " << ms << "ms";
-            stream << (testPair.second->hasAnyCheck() ? "" : ", but test has no any checks.") << '\n';
+            bufStream << "[  OK  ]: " << ms << "ms";
+            bufStream << (testPair.second->hasAnyCheck() ? "" : ", but test has no any checks.") << '\n';
         }
         catch (const TestFailure& failure)
         {
             ++failed;
-            stream << "[FAILED]: " << failure.msg << "\n";
+            bufStream << "[FAILED]: " << failure.msg << "\n";
+        }
+        if (testPair.second->hasOutput())
+        {
+            auto s = testPair.second->getOutput();
+            while (!s.empty())
+            {
+                bufStream << "      > "; // padding
+                auto pos = s.find('\n');
+                bufStream << s.substr(0, pos) << '\n';
+                s.erase(0, pos==std::string::npos?pos:pos+1);
+            }
         }
     }
-    
-    stream << "[TOTAL TIME]: " << std::accumulate(totalt.begin(), totalt.end(), 0.0) << "ms.\n";
-
-    stream << "[  RESULT  ]: " << (failed ? std::to_string(failed) + "/" + std::to_string(testCases.size()) + " test(s) FAILED, see above." :
+    bufStream << "                            Total : " << std::accumulate(totalt.begin(), totalt.end(), 0.0) << "ms.\n";
+    bufStream << "Resume: " << (failed ? std::to_string(failed) + "/" + std::to_string(testCases.size()) + " test(s) FAILED, see above." :
         "all tests have passed SUCCESSFULLY.")
         << "\n";
+
+    stream << bufStream.str();
 }
