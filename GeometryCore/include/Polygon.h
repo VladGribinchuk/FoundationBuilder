@@ -3,6 +3,8 @@
 #include "Point.h"
 
 #include <vector>
+#include <sstream>
+#include <iterator>
 
 namespace geom_utils
 {
@@ -14,6 +16,7 @@ namespace geom_utils
         // Polygon class should not contain any more additional data fields, only points.
         std::vector<FPoint2D> points;
     public:
+        typedef FPoint2D PointType;
         Polygon() = default;
 
         Polygon(std::initializer_list<FPoint2D> points)
@@ -27,6 +30,7 @@ namespace geom_utils
         Polygon& operator=(const Polygon& other)
         {
             points = other.points;
+            return *this;
         }
 
         Polygon(Polygon&& other) noexcept
@@ -36,6 +40,7 @@ namespace geom_utils
         Polygon& operator=(Polygon&& other) noexcept
         {
             points = std::move(other.points);
+            return *this;
         }
 
         void add(const FPoint2D& p) { points.push_back(p); }
@@ -87,5 +92,47 @@ namespace geom_utils
 
         static Polygon makePolygon(const Triangle2D& tri);
     };
+
+    // Polygon output/input operators
+
+    inline std::string PolygonToString(const Polygon& poly)
+    {
+        std::stringstream ss;
+        ss << "{ ";
+        if (!poly.empty())
+        {
+            auto it = poly.begin();
+            for (; it < poly.end(); ++it)
+                ss << *it << (it == std::prev(poly.end()) ? " " : "; ");
+        }
+        ss << "}";
+        return ss.str();
+    }
+
+    inline std::ostream& operator<<(std::ostream& os, const Polygon& poly)
+    {
+        os << PolygonToString(poly);
+        return os;
+    }
+
+    inline std::istream& operator>>(std::istream& is, Polygon& poly)
+    {
+        poly.clear();
+
+        char c;
+        while (is.get(c) && c != '{') {/*search for opening brace*/}
+
+        Polygon::PointType point;
+        while (is)
+        {
+            is >> point;
+            if (point != notAPoint<Polygon::PointType>())
+                poly.add(point);
+            while (is.get(c) && c != ';' && c != '}') { /*search for next point*/ }
+            if (c == '}') // closing brace was found, exit
+                break;
+        }
+        return is;
+    }
 
 }

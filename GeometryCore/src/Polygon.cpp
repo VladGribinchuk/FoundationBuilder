@@ -1,6 +1,5 @@
 #include "../include/Polygon.h"
 #include "../include/Triangle.h"
-#include "../include/GeometryCoreExecEnvironment.h"
 
 namespace geom_utils
 {

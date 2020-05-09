@@ -64,6 +64,6 @@ namespace geom_utils
 
     // Return true if poly and poly2 are close to each other (closer than the provided gap).
     // Note: test vertices of one polygon to see if they are closer than the gap to any lines in other poly.
-    bool polygonsAreAdjacent(const Polygon& poly, const Polygon& poly2, const FPoint2D::coord gap = 1);
+    bool polygonsAreAdjacent(const Polygon& poly, const Polygon& poly2, const FPoint2D::coord gap);
 
 } // namespace geom_utils

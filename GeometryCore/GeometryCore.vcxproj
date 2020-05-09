@@ -152,7 +152,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AABB.cpp" />
-    <ClCompile Include="src\GeometryCoreExecEnvironment.cpp" />
     <ClCompile Include="src\LinearAlgebra.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Polygon.cpp" />
