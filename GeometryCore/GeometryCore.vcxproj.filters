@@ -49,9 +49,6 @@
     <ClCompile Include="src\AABB.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\GeometryCoreExecEnvironment.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\LinearAlgebra.cpp">
       <Filter>src</Filter>
     </ClCompile>

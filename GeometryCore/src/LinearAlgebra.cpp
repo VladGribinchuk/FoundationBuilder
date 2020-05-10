@@ -1,7 +1,6 @@
 #include "../include/LinearAlgebra.h"
 #include "../include/LineSegment.h"
 #include "../include/Polygon.h"
-#include "../include/GeometryCoreExecEnvironment.h"
 
 namespace geom_utils
 {
