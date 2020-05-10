@@ -44,6 +44,7 @@ namespace geom_utils
         }
 
         void add(const FPoint2D& p) { points.push_back(p); }
+        void addRange(const std::vector<FPoint2D>& p) { std::for_each(p.begin(), p.end(), [&](auto el) { points.push_back(el); }); }
         void remove(unsigned index) { points.erase(points.begin() + index); }
         void clear() { points.clear(); }
 

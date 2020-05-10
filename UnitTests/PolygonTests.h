@@ -41,3 +41,45 @@ DEFINE_TEST_CASE(PolygonInput_CorruptedData)
     // assert below won't work for now, because operator== isn't completed yet
     // TEST_ASSERT(poly == expected, "Polygon input operation is incorrect!");
 }
+
+DEFINE_TEST_CASE(PolygonAddRange)
+{
+    std::stringstream ss;
+    Polygon p;
+    p.addRange({ {2.000, 5.000 } , {4.000, 8.000 } , {3.000, 11.000 } });
+    std::for_each(p.begin(), p.end(), [&](auto el) {ss << el; });
+    TEST_CHECK((ss).str(), std::string("{2.000; 5.000}{4.000; 8.000}{3.000; 11.000}"), "The polygon points must be {2.000; 5.000}{4.000; 8.000}{3.000; 11.000}!");
+}
+
+DEFINE_TEST_CASE(PolygonOrientation)
+{
+    Polygon p({ {-2.000, 5.000}, { -1.000, -2.000 }, { 3.000, -1.000 }, { 3.000, 5.000 } });
+    TEST_ASSERT(p.orientation(), "Orientation must return <true>!");
+}
+
+DEFINE_TEST_CASE(PolygonOrientation_false)
+{
+    Polygon p({ {-2.000, 5.000}, { 3.000, 5.000 }, { 3.000, -1.000 }, { -1.000, -2.000 } });
+    TEST_ASSERT(!(p.orientation()), "Orientation must be non-counter clockwise!");
+}
+
+DEFINE_TEST_CASE(PolygonConvexHull)
+{
+    std::stringstream ss;
+    Polygon p({ {-2.000, 5.000}, { 1.000, 3.000 }, { 1.000, 1.000 }, { 2.000, 2.000 }, { 3.000, -1.000 }, { -1.000, -2.000 }, { 3.000, 5.000 } });
+    Polygon convex_p = p.convexHull();
+    std::for_each(convex_p.begin(), convex_p.end(), [&](auto el) {ss << el; });
+    TEST_CHECK((ss).str(), std::string("{-2.000; 5.000}{-1.000; -2.000}{3.000; -1.000}{3.000; 5.000}"), "The convex hull must be {-2.000; 5.000}{-1.000; -2.000}{3.000; -1.000}{3.000; 5.000}!");
+}
+
+DEFINE_TEST_CASE(PolygonIsConvexHull)
+{
+    Polygon p({ {2, 5}, {-3, 3}, {-4,-2}, {-4,-3}, {-2,-3}, {3,0} });
+    TEST_ASSERT(p.isConvexHull(), "The polygon must be convex!");
+}
+
+DEFINE_TEST_CASE(PolygonIsConvexHull_false)
+{
+    Polygon p({ {2, 5}, {-3, 3}, {-4,-2}, {0,0}, {-2,-3}, {3,0} });
+    TEST_ASSERT(!(p.isConvexHull()), "The polygon must be non-convex!");
+}
