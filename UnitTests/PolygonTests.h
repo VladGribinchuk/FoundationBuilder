@@ -60,7 +60,7 @@ DEFINE_TEST_CASE(PolygonOrientation)
 DEFINE_TEST_CASE(PolygonOrientation_false)
 {
     Polygon p({ {-2.000, 5.000}, { 3.000, 5.000 }, { 3.000, -1.000 }, { -1.000, -2.000 } });
-    TEST_ASSERT(!(p.orientation()), "Orientation must be non-counter clockwise!");
+    TEST_ASSERT(!(p.orientation()), "Orientation must be clockwise!");
 }
 
 DEFINE_TEST_CASE(PolygonConvexHull)
@@ -82,4 +82,10 @@ DEFINE_TEST_CASE(PolygonIsConvexHull_false)
 {
     Polygon p({ {2, 5}, {-3, 3}, {-4,-2}, {0,0}, {-2,-3}, {3,0} });
     TEST_ASSERT(!(p.isConvexHull()), "The polygon must be non-convex!");
+}
+
+DEFINE_TEST_CASE(PolygonArea)
+{
+    Polygon p({ {2, 5}, {-3, 3}, {-4,-2}, {-4,-3}, {-2,-3}, {3,0} });
+    TEST_ASSERT(p.area() == -36.5, "The area must be -36.500!");
 }

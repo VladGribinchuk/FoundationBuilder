@@ -1,5 +1,6 @@
 #include "../include/Polygon.h"
 #include "../include/Triangle.h"
+#include "../include/LinearAlgebra.h"
 
 namespace geom_utils
 {
@@ -22,13 +23,7 @@ namespace geom_utils
     // Calculate area of polygon
     inline FPoint2D::coord Polygon::area() const 
     { 
-        return {}; 
-    }
-
-    // Return true if polygon orientation is counter-clockwise (i.e. area is positive)
-    bool Polygon::orientation() const
-    {
-        //if (this->points.size() < 3) return false;
+        if (this->points.size() < 3) return false; //can't bild a polygon from 2 points or less
         float res = 0.0;
 
         #pragma omp parallel for
@@ -40,7 +35,14 @@ namespace geom_utils
             res += (v2.x - v1.x) * (v2.y + v1.y);
         }
 
-        return res < 0 ? true : false;
+        return res/2;
+    }
+
+    // Return true if polygon orientation is counter-clockwise (i.e. area is positive)
+    bool Polygon::orientation() const
+    {
+        auto res = this->area();
+        return res < 0;
     }
 
     // Return center of mass of the polygon
@@ -70,13 +72,11 @@ namespace geom_utils
     // Calculate and return convex hull for the polygon
     Polygon Polygon::convexHull() const 
     { 
-        //if (points.size() < 3) return; //can't bild a polygon from 2 points or less //idk how to do it
+        if (points.size() <= 3) return *this; //can't bild a polygon from 2 points or less
         Polygon convexHull;
-        int pos_of_the_most_right_point = 0;
-
-        for (int i = 1; i < points.size(); i++) if (points[i].x < points[pos_of_the_most_right_point].x) pos_of_the_most_right_point = i; //idk how to do it with stl
-
+        auto pos_of_the_most_right_point = min_element(points.begin(), points.end(), [](auto a, auto b) {return b.x > a.x; }) - points.begin();
         int pos_of_cur_point = pos_of_the_most_right_point;
+
         do
         {
             convexHull.points.push_back(points[pos_of_cur_point]);
@@ -99,26 +99,20 @@ namespace geom_utils
     bool Polygon::isConvexHull() const
     {
         if (points.size() < 3) return false;
-        int convex_flag = 0;
         bool isConvex = true;
+        bool isCounterClockwise = this->orientation();
 
         #pragma omp parallel for
         for (int i = 0; i < points.size(); i++)
         {
-            FPoint2D v1 = points[i];
-            FPoint2D v2 = points[(i + 1) % points.size()];
-            FPoint2D v3 = points[(i + 2) % points.size()];
-            float res = (v2.x - v1.x) * (v3.y - v2.y) - (v2.y - v1.y) * (v3.x - v2.x);
+            FPoint2D p(points[(i + 1) % points.size()].x - points[i].x, points[(i + 1) % points.size()].y - points[i].y);
+            FPoint2D p2(points[(i + 2) % points.size()].x - points[(i + 1) % points.size()].x, points[(i + 2) % points.size()].y - points[(i + 1) % points.size()].y);
+            float res = geom_utils::cross(p, p2);
 
-            #pragma omp critical
-            {
-                if (res < 0) convex_flag |= 1;
-                else if (res > 0) convex_flag |= 2;
-                if (convex_flag == 3) isConvex = false;
-            }
+            if ((isCounterClockwise == true && res < 0) || (isCounterClockwise == false && res > 0)) 
+                isConvex = false;
         }
-        if (convex_flag != 0 && isConvex != false) return true;
-        else return false;
+        return isConvex;
     }
 
     // The most simple triangulation approach. Work only for convex hull polygons. 
