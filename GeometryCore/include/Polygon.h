@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Point.h"
-
+#include <algorithm>
 #include <vector>
 #include <sstream>
 #include <iterator>
@@ -44,6 +44,7 @@ namespace geom_utils
         }
 
         void add(const FPoint2D& p) { points.push_back(p); }
+        void addRange(const std::vector<FPoint2D>& p) { std::copy(p.begin(), p.end(), std::back_inserter(points)); }
         void remove(unsigned index) { points.erase(points.begin() + index); }
         void clear() { points.clear(); }
 
