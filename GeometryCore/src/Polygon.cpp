@@ -23,7 +23,7 @@ namespace geom_utils
     // Calculate area of polygon
     inline FPoint2D::coord Polygon::area() const 
     { 
-        if (this->points.size() < 3) return false; //can't bild a polygon from 2 points or less
+        if (this->points.size() < 3) return 0; //can't measure an area of a line or point
         float res = 0.0;
 
         #pragma omp parallel for
@@ -41,8 +41,7 @@ namespace geom_utils
     // Return true if polygon orientation is counter-clockwise (i.e. area is positive)
     bool Polygon::orientation() const
     {
-        auto res = this->area();
-        return res < 0;
+        return area() < 0;
     }
 
     // Return center of mass of the polygon
@@ -74,7 +73,7 @@ namespace geom_utils
     { 
         if (points.size() <= 3) return *this; //can't bild a polygon from 2 points or less
         Polygon convexHull;
-        auto pos_of_the_most_right_point = min_element(points.begin(), points.end(), [](auto a, auto b) {return b.x > a.x; }) - points.begin();
+        auto pos_of_the_most_right_point = std::min_element(points.begin(), points.end(), [](auto a, auto b) {return b.x > a.x; }) - points.begin();
         int pos_of_cur_point = pos_of_the_most_right_point;
 
         do
@@ -98,21 +97,18 @@ namespace geom_utils
     // Return true if polygon contour is convex, false if non-convex
     bool Polygon::isConvexHull() const
     {
-        if (points.size() < 3) return false;
-        bool isConvex = true;
-        bool isCounterClockwise = this->orientation();
+        if (points.size() < 2) return false;
 
-        #pragma omp parallel for
+        bool isCounterClockwise = orientation();
         for (int i = 0; i < points.size(); i++)
         {
-            FPoint2D p(points[(i + 1) % points.size()].x - points[i].x, points[(i + 1) % points.size()].y - points[i].y);
-            FPoint2D p2(points[(i + 2) % points.size()].x - points[(i + 1) % points.size()].x, points[(i + 2) % points.size()].y - points[(i + 1) % points.size()].y);
-            float res = geom_utils::cross(p, p2);
+            auto vec1 = points[(i + 1) % points.size()] - points[i];
+            auto vec2 = points[(i + 2) % points.size()] - points[i];
 
-            if ((isCounterClockwise == true && res < 0) || (isCounterClockwise == false && res > 0)) 
-                isConvex = false;
+            if (isCounterClockwise ? cross(vec1, vec2) < 0 : cross(vec1, vec2) > 0)
+                return false;
         }
-        return isConvex;
+        return true;
     }
 
     // The most simple triangulation approach. Work only for convex hull polygons. 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Point.h"
-
+#include <algorithm>
 #include <vector>
 #include <sstream>
 #include <iterator>
