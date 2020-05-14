@@ -145,6 +145,7 @@
     <ClCompile Include="UnitTests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LinearAlgebraTests.h" />
     <ClInclude Include="PointTests.h" />
     <ClInclude Include="PolygonTests.h" />
     <ClInclude Include="UnitTests.h" />
