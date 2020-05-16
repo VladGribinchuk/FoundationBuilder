@@ -28,6 +28,7 @@
     <ClInclude Include="PolygonTests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LinearAlgebraTests.h">
     <ClInclude Include="PerformanceTests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
