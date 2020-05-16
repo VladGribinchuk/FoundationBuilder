@@ -109,7 +109,7 @@ void UnitTests::run(std::ostream& stream)
                         so.flush();
                     }
                     so.erase(14);
-                    so << "[  OK  ]: " << (repTestCase->iterationCnt > 1 ? ("average iteration time = ") : "run time = ") << (ms / repTestCase->iterationCnt) << "ms\n";
+                    so << "[  OK  ]: " << (repTestCase->iterationCnt > 1 ? ("average iteration time = ") : "run time = ") << size_t(ms / repTestCase->iterationCnt) << "ms\n";
                     so.flush();
                 }
                 else

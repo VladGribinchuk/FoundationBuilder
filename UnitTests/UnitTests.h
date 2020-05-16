@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include <unordered_map>
 #include <sstream>
 
 // Simple class for unit testing.
@@ -63,7 +62,6 @@ private:
     std::string currentGroupName;
     using TestCases = std::map<std::string, TestCase*>;
     std::map<std::string, TestCases> testCases;
-    //std::map<std::string, TestCase*> testCases;
 };
 
 extern UnitTests& globUnitTests;
