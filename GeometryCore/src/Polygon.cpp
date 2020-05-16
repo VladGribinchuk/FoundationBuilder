@@ -21,7 +21,7 @@ namespace geom_utils
     }
 
     // Calculate area of polygon
-    inline FPoint2D::coord Polygon::area() const 
+    FPoint2D::coord Polygon::area() const 
     { 
         if (this->points.size() < 3) return 0; //can't measure an area of a line or point
         float res = 0.0;
