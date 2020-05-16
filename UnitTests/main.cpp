@@ -2,6 +2,7 @@
 
 #include "PointTests.h"
 #include "PolygonTests.h"
+#include "PerformanceTests.h"
 
 int main()
 {
