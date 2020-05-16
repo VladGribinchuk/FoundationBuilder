@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <sstream>
 
 // Simple class for unit testing.
@@ -45,11 +46,24 @@ public:
         std::stringstream outputBuffer;
     };
 
-    void add(std::string testName, TestCase* test) { testCases[testName] = test; }
+    class RepeatedTestCase : public TestCase
+    {
+    protected:
+        size_t iterationCnt;
+        friend class UnitTests;
+    };
+
+    void add(std::string testName, TestCase* test) { testCases[getCurrentGroupName()][testName] = test; }
     void run(std::ostream& stream = std::cout);
 
+    void setCurrentGroupName(std::string newName) { currentGroupName = newName; }
+    std::string getCurrentGroupName() const { return currentGroupName; }
+
 private:
-    std::map<std::string, TestCase*> testCases;
+    std::string currentGroupName;
+    using TestCases = std::map<std::string, TestCase*>;
+    std::map<std::string, TestCases> testCases;
+    //std::map<std::string, TestCase*> testCases;
 };
 
 extern UnitTests& globUnitTests;
@@ -60,14 +74,40 @@ static struct UnitTestsInitializer {
     ~UnitTestsInitializer();
 } unitTestsInitializer;
 
+struct SetTestGroupName { SetTestGroupName(std::string newName){ globUnitTests.setCurrentGroupName(newName); } };
+
+#define DEFINE_TEST_GROUP_BEGIN(groupName) \
+namespace { SetTestGroupName var_##groupName { #groupName }; }
+
+#define DEFINE_TEST_GROUP_END() \
+namespace { SetTestGroupName var { "" }; }
+
 #define DEFINE_TEST_CASE(test) \
 class test : public UnitTests::TestCase { \
 public: \
-    test() {globUnitTests.add(#test, this);};\
+    test() { globUnitTests.add(#test, this);};\
     void run() override; \
 }; \
 namespace {test var_##test;}\
 void test ::run()
+
+#define DEFINE_TEST_CASE_TIME_STAMP(test) \
+class test : public UnitTests::RepeatedTestCase { \
+public: \
+    test() {iterationCnt = 1; globUnitTests.add(#test, this);};\
+    void run() override; \
+}; \
+namespace {test var_##test;}\
+void test::run()
+
+#define DEFINE_TEST_CASE_TIME_STAMP_REAPETABLE(test, iterations) \
+class test : public UnitTests::RepeatedTestCase { \
+public: \
+    test() {iterationCnt = iterations; globUnitTests.add(#test, this);};\
+    void run() override; \
+}; \
+namespace {test var_##test;}\
+void test::run()
 
 #define RUN_ALL_TESTS() \
 do { \
