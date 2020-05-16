@@ -85,12 +85,15 @@ namespace geom_utils
     //Return true if polygon is close to line (closer than given gap)
     bool polygonAndLineSegmentAreAdjacent(const Polygon& poly, const LineSegment2D& line, const FPoint2D::coord gap) {
         int size = poly.size();
-        std::vector<FPoint2D::coord> distance_from_line_to_polygon_side(size);
+        if (size == 0) {
+            return false;
+        }
 
+        std::vector<FPoint2D::coord> distance_from_line_to_polygon_side(size);
         #pragma omp parallel for
         for (int i = 0; i < size; ++i) {
-                LineSegment2D side(poly[i], poly[(i + 1) % size]);
-                distance_from_line_to_polygon_side[i] = distanceBetweenLineSegments(line, side);
+            LineSegment2D side(poly[i], poly[(i + 1) % size]);
+            distance_from_line_to_polygon_side[i] = distanceBetweenLineSegments(line, side);
         }
         return *std::min_element(distance_from_line_to_polygon_side.begin(), distance_from_line_to_polygon_side.end()) <= gap;
     }
@@ -99,6 +102,9 @@ namespace geom_utils
     // Note: test vertices of one polygon to see if they are closer than the gap to any lines in other poly.
     bool polygonsAreAdjacent(const Polygon& poly, const Polygon& poly2, const FPoint2D::coord gap) {
         int size = poly2.size();
+        if (size == 0) {
+            return false;
+        }
         std::vector<bool> polygon_side_closer_to_second_polygon_than_gap(size);
         #pragma omp parallel for
         for (int i = 0; i < size; ++i) {

@@ -178,12 +178,18 @@ DEFINE_TEST_CASE(PolygonAndLineColl)
 DEFINE_TEST_CASE(PolyAndLineAdjacent)
 {
 	Polygon p({ { 2.00, 2.00 }, { 2.00, 3.00 }, { 3.00, 3.00 }, { 3.00, 2.00 } });
+	Polygon p2({});
+	Polygon p3({ { 1, 1 } });
+	Polygon p4({ { 1, 4 }, { 2, 3 } });
 	
 	LineSegment2D l1(FPoint2D(3, 1), FPoint2D(2.50, 2)), l2(FPoint2D(2, 1), FPoint2D(3, 1));
 	TEST_CHECK(polygonAndLineSegmentAreAdjacent(p, l1, mm(0.50)), true, "Polygon and line segment must adjacent");
 	TEST_CHECK(polygonAndLineSegmentAreAdjacent(p, l1, mm(0.10)), true, "Polygon and line segment must adjacent");
 	TEST_CHECK(polygonAndLineSegmentAreAdjacent(p, l2, mm(0.50)), false, "Polygon and line segment must not adjacent");
 	TEST_CHECK(polygonAndLineSegmentAreAdjacent(p, l2, mm(1.00)), true, "Polygon and line segment must adjacent");
+	TEST_CHECK(polygonAndLineSegmentAreAdjacent(p2, l1, mm(1000.00)), false, "Polygon and line segment must not adjacent");
+	TEST_CHECK(polygonAndLineSegmentAreAdjacent(p3, l2, mm(1.50)), true, "Polygon and line segment must adjacent");
+	TEST_CHECK(polygonAndLineSegmentAreAdjacent(p4, l2, mm(4.00)), true, "Polygon and line segment must adjacent");
 }
 
 DEFINE_TEST_CASE(PolyAndPolyAdjacent)
@@ -191,11 +197,13 @@ DEFINE_TEST_CASE(PolyAndPolyAdjacent)
 	Polygon p1({ {2.00, 2.00}, { 2.00, 3.00 }, { 3.00, 3.00 }, { 3.00, 2.00 } });
 	Polygon p2({ {2.50, 2.50}, { 2.50, 4.00 }, { 4.00, 4.00 }, { 4.00, 2.00 } });
 	Polygon p3({ {5.00, 3.00}, { 5.00, 5.00 }, { 7.00, 5.00 }, { 7.00, 4.00 }, { 6.00 , 4.00 }, { 6.00, 3.00 } });
-
+	Polygon p4({});
 	TEST_CHECK(polygonsAreAdjacent(p1, p2, mm(1.00)), true, "Polygons must adjacent");
 	TEST_CHECK(polygonsAreAdjacent(p1, p3, mm(1.00)), false, "Polygons must not adjacent");
 	TEST_CHECK(polygonsAreAdjacent(p1, p3, mm(2.00)), true, "Polygons must adjacent");
 	TEST_CHECK(polygonsAreAdjacent(p2, p3, mm(1.00)), true, "Polygons must adjacent");
+	TEST_CHECK(polygonsAreAdjacent(p3, p3, mm(5.00)), true, "Polygons must adjacent");
 	TEST_CHECK(polygonsAreAdjacent(p2, p3, mm(0.90)), false, "Polygons must not adjacent");
+	TEST_CHECK(polygonsAreAdjacent(p4, p4, mm(1000.00)), false, "Polygons must not adjacent");
 	
 }
