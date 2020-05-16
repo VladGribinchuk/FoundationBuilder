@@ -75,7 +75,7 @@ DEFINE_TEST_CASE(PosPointsCross3D)
 {
 	FPoint3D first(10, 20, 30);
 	FPoint3D second(50, 40, 40);
-	TEST_CHECK(cross(first, second), mm(100.00), "Cross must be 100 mm!");
+	TEST_CHECK(cross(first, second), FPoint3D(-400, 1100, -600), "Cross must be 100 mm!");
 }
 DEFINE_TEST_CASE(PosPointsDistance3D)
 {
@@ -94,7 +94,7 @@ DEFINE_TEST_CASE(NegPointsCross3D)
 {
 	FPoint3D first(-10, -5, -20);
 	FPoint3D second(-30, -10, -10);
-	TEST_CHECK(cross(first, second), mm(300.00), "Cross must be 300 mm!");
+	TEST_CHECK(cross(first, second), FPoint3D(-150, 500, -50), "Cross must be 300 mm!");
 }
 DEFINE_TEST_CASE(NegPointsDistance3D)
 {
@@ -113,7 +113,7 @@ DEFINE_TEST_CASE(MixPointsCross3D)
 {
 	FPoint3D first(-5, 10, 30);
 	FPoint3D second(40, -10, -20);
-	TEST_CHECK(cross(first, second), mm(850.00), "Cross must be 850 mm!");
+	TEST_CHECK(cross(first, second), FPoint3D(100, 1100, -350), "Cross must be 850 mm!");
 }
 DEFINE_TEST_CASE(MixPointsDistance3D)
 {
@@ -167,14 +167,18 @@ DEFINE_TEST_CASE(DistanceBetweenLineSegm)
 DEFINE_TEST_CASE(PolygonAndLineColl)
 {
 	Polygon p({ {2.00, 2.00}, { 2.00, 3.00 }, { 3.00, 3.00 }, { 3.00, 2.00 } });
+	Polygon p2({ { 2.00, 3.00 }, { 2.00, 7.00 }, { 6.00, 7.00 }, { 4.00, 5.00 }, { 6.00, 3.00 } });
 	LineSegment2D l1(FPoint2D(3, 1), FPoint2D(2.50, 2)), l2(FPoint2D(2, 1), FPoint2D(3, 1));
+	LineSegment2D l3(FPoint2D(8, 6), FPoint2D(5, 5));
 	TEST_CHECK(polygonAndLineSegmentCollides(p, l1), true, "Polygon and line segment must collide");
 	TEST_CHECK(polygonAndLineSegmentCollides(p, l2), false, "Polygon and line segment must not collide");
+	TEST_CHECK(polygonAndLineSegmentCollides(p2, l3), false, "Polygon and line segment must not collide");
 }
 
 DEFINE_TEST_CASE(PolyAndLineAdjacent)
 {
-	Polygon p({ {2.00, 2.00}, { 2.00, 3.00 }, { 3.00, 3.00 }, { 3.00, 2.00 } });
+	Polygon p({ { 2.00, 2.00 }, { 2.00, 3.00 }, { 3.00, 3.00 }, { 3.00, 2.00 } });
+	
 	LineSegment2D l1(FPoint2D(3, 1), FPoint2D(2.50, 2)), l2(FPoint2D(2, 1), FPoint2D(3, 1));
 	TEST_CHECK(polygonAndLineSegmentAreAdjacent(p, l1, mm(0.50)), true, "Polygon and line segment must adjacent");
 	TEST_CHECK(polygonAndLineSegmentAreAdjacent(p, l1, mm(0.10)), true, "Polygon and line segment must adjacent");

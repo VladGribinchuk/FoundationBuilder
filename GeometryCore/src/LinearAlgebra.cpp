@@ -72,45 +72,38 @@ namespace geom_utils
     // Return true if poly and line are colliding with each other.
     // Note: consider collision even if one of line end lies exactly on the polygon contour
     bool polygonAndLineSegmentCollides(const Polygon& poly, const LineSegment2D& line) {
-        auto convex = poly.convexHull();
-        std::vector<bool> line_collide_with_polygon_side;
-        for (int i = 0; i < convex.size(); ++i) {
-                LineSegment2D lie(convex[i], convex[(i + 1) % convex.size()]);
-                line_collide_with_polygon_side.push_back(lineSegmentsCollide(line, lie));
-        }
-        if (std::any_of(line_collide_with_polygon_side.begin(), line_collide_with_polygon_side.end(), [](bool k) {return k; })) {
-            return true;
+        int size = poly.size();
+        for (int i = 0; i < size; ++i) {
+            LineSegment2D side(poly[i], poly[(i + 1) % size]);
+            if (lineSegmentsCollide(line, side)) {
+                return true;
+            }
         }
         return false;
     }
 
     //Return true if polygon is close to line (closer than given gap)
     bool polygonAndLineSegmentAreAdjacent(const Polygon& poly, const LineSegment2D& line, const FPoint2D::coord gap) {
-        auto convex = poly.convexHull();
-        std::vector<FPoint2D::coord> distance_from_line_to_polygon_side;
+        int size = poly.size();
+        std::vector<FPoint2D::coord> distance_from_line_to_polygon_side(size);
+
         #pragma omp parallel for
-        for (int i = 0; i < convex.size(); ++i) {
-                LineSegment2D lie(convex[i], convex[(i + 1) % convex.size()]);
-                #pragma omp atomic
-                distance_from_line_to_polygon_side.push_back(distanceBetweenLineSegments(line, lie));
+        for (int i = 0; i < size; ++i) {
+                LineSegment2D side(poly[i], poly[(i + 1) % size]);
+                distance_from_line_to_polygon_side[i] = distanceBetweenLineSegments(line, side);
         }
-        FPoint2D::coord min_distance = distance_from_line_to_polygon_side[0];
-        for (const auto& i : distance_from_line_to_polygon_side) {
-            min_distance = std::min(min_distance, i);
-        }
-        return min_distance <= gap;
+        return *std::min_element(distance_from_line_to_polygon_side.begin(), distance_from_line_to_polygon_side.end()) <= gap;
     }
 
     // Return true if poly and poly2 are close to each other (closer than the provided gap).
     // Note: test vertices of one polygon to see if they are closer than the gap to any lines in other poly.
     bool polygonsAreAdjacent(const Polygon& poly, const Polygon& poly2, const FPoint2D::coord gap) {
-        auto convex = poly2.convexHull();
-        std::vector<bool> polygon_side_closer_to_second_polygon_than_gap;
+        int size = poly2.size();
+        std::vector<bool> polygon_side_closer_to_second_polygon_than_gap(size);
         #pragma omp parallel for
-        for (int i = 0; i < convex.size(); ++i) {
-                LineSegment2D lie(convex[i], convex[(i + 1) % convex.size()]);
-                #pragma omp atomic
-                polygon_side_closer_to_second_polygon_than_gap.push_back(polygonAndLineSegmentAreAdjacent(poly, lie, gap));
+        for (int i = 0; i < size; ++i) {
+                LineSegment2D side(poly2[i], poly2[(i + 1) % size]);
+                polygon_side_closer_to_second_polygon_than_gap[i] = polygonAndLineSegmentAreAdjacent(poly, side, gap);
         }
         return std::any_of(polygon_side_closer_to_second_polygon_than_gap.begin(), polygon_side_closer_to_second_polygon_than_gap.end(), [](bool k) {return k; });
     }

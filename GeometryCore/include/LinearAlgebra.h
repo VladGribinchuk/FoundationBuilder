@@ -36,9 +36,9 @@ namespace geom_utils
     }
 
     template<typename T>
-    constexpr typename Point3D<T>::coord cross(const Point3D<T>& p, const Point3D<T>& p2)
+    constexpr typename Point3D<T> cross(const Point3D<T>& p, const Point3D<T>& p2)
     {
-        return p.y * p2.z - p.z * p2.y + p.z * p2.x - p.x * p2.z + p.x * p2.y - p.y * p2.x;
+        return Point3D<T>(p.y * p2.z - p.z * p2.y, p.z * p2.x - p.x * p2.z, p.x * p2.y - p.y * p2.x);
     }
 
     template<typename T>
