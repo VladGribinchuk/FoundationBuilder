@@ -15,17 +15,26 @@ namespace geom_utils
     }
 
     bool AABB2D::contains(const FPoint2D& p) const
-    { 
-        return{}; 
+    {
+        if (p.x <= pmax.x && p.y <= pmax.y && p.x >= pmin.x && p.y >= pmin.y)  return true;
+        else return false;
     }
 
     void AABB2D::calculate(const Polygon& poly)
     {
-
+        auto maxX = std::max_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.x > a.x; }) - poly.begin();
+        pmax.x = poly[maxX].x;
+        auto maxY = std::max_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.y > a.y; }) - poly.begin();
+        pmax.y = poly[maxY].y;
+        auto minX = std::min_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.x > a.x; }) - poly.begin();
+        pmin.x = poly[minX].x;
+        auto minY = std::min_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.y > a.y; }) - poly.begin();
+        pmin.y = poly[minY].y;
     }
 
     bool AABB3D::contains(const FPoint3D& p) const
     {
-        return {};
+        if (p.x <= pmax.x && p.y <= pmax.y && p.z <= pmax.z && p.x >= pmin.x && p.y >= pmin.y && p.z >= pmin.z)  return true;
+        else return false;
     }
 }

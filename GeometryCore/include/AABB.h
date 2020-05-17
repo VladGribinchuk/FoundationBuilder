@@ -41,7 +41,7 @@ namespace geom_utils
         FPoint3D pmin, pmax;
 
         AABB3D()
-            : pmin(minPoint<FPoint3D>()), pmax(maxPoint<FPoint3D>())
+            : pmin(maxPoint<FPoint3D>()), pmax(minPoint<FPoint3D>())
         {}
 
         AABB3D(const FPoint3D& min, const FPoint3D& max)
