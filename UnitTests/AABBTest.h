@@ -20,13 +20,14 @@ DEFINE_TEST_CASE(isNotValid) {
   
     Polygon poly;
     AABB2D aabb2d(poly);
-    TEST_ASSERT(!aabb2d.isValid(aabb2d), "AABB must be not valid!");
+    TEST_ASSERT(aabb2d.isValid(aabb2d), "AABB must be not valid!");
 }
 
 DEFINE_TEST_CASE(isValid) {
     Polygon poly = { FPoint2D(1, 2), FPoint2D(3, 4), FPoint2D(5, 6) };
     AABB2D aabb2d(poly);
     TEST_ASSERT(aabb2d.isValid(aabb2d), "AABB must be valid!");
+
 }
 
 DEFINE_TEST_CASE(countainsFpoint2DInAABB) {
