@@ -18,6 +18,7 @@ namespace geom_utils
         Triangle3D(const FPoint3D& a, const FPoint3D& b, const FPoint3D& c)
             : a(a), b(b), c(c)
         {}
+        Triangle3D() = default;
 
         FPoint3D a, b, c;
     };
