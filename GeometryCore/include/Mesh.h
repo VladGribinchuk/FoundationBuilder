@@ -9,20 +9,20 @@ namespace geom_utils
 {
     class Mesh
     {
-        std::vector<Triangle3D> vertices;
-        std::string comment;
+        std::vector<Triangle3D> facets;
+        std::string modelName;
         
     public:
         Mesh() = default; //empty mesh
-        bool isEmpty() const { return vertices.empty(); }
-        void add(const Triangle3D& p) { vertices.push_back(p); }
-        size_t size() const { return this->vertices.size(); }
+        bool isEmpty() const { return facets.empty(); }
+        void add(const Triangle3D& p) { facets.push_back(p); }
+        size_t size() const { return this->facets.size(); }
 
-        void setComment(const std::string& str) { this->comment = str; }
-        std::string getComment() const { return this->comment; }
+        void setModelName(const std::string& str) { this->modelName = str; }
+        std::string getModelName() const { return this->modelName; }
 
-        const Triangle3D& operator[] (unsigned index) const { return vertices[index]; }
-        Triangle3D& operator[] (unsigned index) { return vertices[index]; }
+        const Triangle3D& operator[] (unsigned index) const { return facets[index]; }
+        Triangle3D& operator[] (unsigned index) { return facets[index]; }
 
     };
 

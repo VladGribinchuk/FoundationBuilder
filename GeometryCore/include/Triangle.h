@@ -20,8 +20,7 @@ namespace geom_utils
         {}
 
         FPoint3D a, b, c;
+        FPoint3D getNormal() const;
     };
 
-    FPoint3D getNormal(const Triangle3D& triangel);
-    FPoint2D getNormal(const Triangle2D& triangel);
 }

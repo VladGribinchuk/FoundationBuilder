@@ -31,7 +31,7 @@ namespace geom_utils
 		{
 			fromfile >> line;
 			fromfile >> line; //comment
-			mesh.setComment(line);
+			mesh.setModelName(line);
 
 			while (fromfile >> line)
 				if (line.find("vertex") != std::string::npos)
@@ -73,7 +73,7 @@ namespace geom_utils
 		{
 			char header_info[80] = "";
 			fromfile.read(header_info, 80);
-			mesh.setComment(header_info);
+			mesh.setModelName(header_info);
 
 			unsigned int numTris = 0;
 			fromfile.read((char*)&numTris, 4);
@@ -105,11 +105,11 @@ namespace geom_utils
 
 		if (infile.is_open())
 		{
-			infile << "solid " << mesh.getComment();
+			infile << "solid " << mesh.getModelName();
 
 			for (int i = 0; i < mesh.size(); i++)
 			{
-				FPoint3D normal = geom_utils::getNormal(mesh[i]);
+				FPoint3D normal = mesh[i].getNormal();
 				infile << "\n facet normal " << normal.x << " " << normal.y << " " << normal.z << "\n  outer loop";
 
 				infile << "\n  vertex " << mesh[i].a.x << " " << mesh[i].a.y << " " << mesh[i].a.z;
@@ -118,7 +118,7 @@ namespace geom_utils
 
 				infile << "\n  endloop\n endfacet\n";
 			}
-			infile << "\nendsolid " << mesh.getComment();
+			infile << "\nendsolid " << mesh.getModelName();
 		}
 		infile.close();
 	}
