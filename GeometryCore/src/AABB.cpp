@@ -38,6 +38,11 @@ namespace geom_utils
             auto minY = std::min_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.y > a.y; }) - poly.begin();
             pmin.y = poly[minY].y;
         }
+        else 
+        {
+            pmin = (maxPoint<FPoint2D>());
+            pmax = (minPoint<FPoint2D>());
+        }
         
     }
 
