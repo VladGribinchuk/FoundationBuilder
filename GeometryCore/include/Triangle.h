@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Point.h"
 
 namespace geom_utils
@@ -15,10 +14,14 @@ namespace geom_utils
 
     struct Triangle3D
     {
+        Triangle3D() {};
         Triangle3D(const FPoint3D& a, const FPoint3D& b, const FPoint3D& c)
             : a(a), b(b), c(c)
         {}
 
         FPoint3D a, b, c;
     };
+
+    FPoint3D getNormal(const Triangle3D& triangel);
+    FPoint2D getNormal(const Triangle2D& triangel);
 }
