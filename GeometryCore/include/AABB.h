@@ -31,7 +31,7 @@ namespace geom_utils
         bool contains(const FPoint2D& p) const;
 
         //return true if aabb2d (Bound Box) valid
-        bool isValid(const AABB2D& aabb2d);
+        bool isValid();
 
     private:
         // Calculate min, max based on given poly.

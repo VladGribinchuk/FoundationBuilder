@@ -14,9 +14,9 @@ namespace geom_utils
         calculate(Polygon::makePolygon(tri));
     }
 
-    bool AABB2D::isValid(const AABB2D& aabb2d) 
+    bool AABB2D::isValid() 
     {
-        if (aabb2d.pmax.x < aabb2d.pmin.x || aabb2d.pmax.y < aabb2d.pmin.y) return false;
+        if (pmax.x < pmin.x || pmax.y < pmin.y) return false;
         else return true;
     }
 
@@ -28,7 +28,7 @@ namespace geom_utils
 
     void AABB2D::calculate(const Polygon& poly)
     {
-        if (!poly.empty() && poly.size() != 0) {
+        if (!poly.empty()) {
             auto maxX = std::max_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.x > a.x; }) - poly.begin();
             pmax.x = poly[maxX].x;
             auto maxY = std::max_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.y > a.y; }) - poly.begin();
