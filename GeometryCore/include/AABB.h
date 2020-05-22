@@ -30,6 +30,9 @@ namespace geom_utils
         // Return true if p is inside the AABB boundaries.
         bool contains(const FPoint2D& p) const;
 
+        //return true if aabb2d (Bound Box) valid
+        bool isValid();
+
     private:
         // Calculate min, max based on given poly.
         void calculate(const Polygon&);
@@ -41,7 +44,7 @@ namespace geom_utils
         FPoint3D pmin, pmax;
 
         AABB3D()
-            : pmin(minPoint<FPoint3D>()), pmax(maxPoint<FPoint3D>())
+            : pmin(maxPoint<FPoint3D>()), pmax(minPoint<FPoint3D>())
         {}
 
         AABB3D(const FPoint3D& min, const FPoint3D& max)
