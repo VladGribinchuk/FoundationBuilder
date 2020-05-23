@@ -30,6 +30,9 @@
     <ClInclude Include="LinearAlgebraTests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AABBTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

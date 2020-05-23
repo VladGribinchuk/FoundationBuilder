@@ -6,6 +6,7 @@
 #include "PerformanceTests.h"
 #include "MeshTests.h"
 #include "TriangleTests.h"
+#include "AABBTest.h"
 
 int main()
 {

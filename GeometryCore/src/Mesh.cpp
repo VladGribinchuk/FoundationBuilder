@@ -81,8 +81,7 @@ namespace geom_utils
 		unsigned int expectedFacetCount = 0;
 		fromfile.read((char*)&expectedFacetCount, 4);
 
-		//if (actualFacetCount != expectedFacetCount)
-			//trace("File could be corrupted, since actual facet count is not equal to expected facet count");
+		if (actualFacetCount != expectedFacetCount) return false;
 
 		char buffer[SIZE_OF_FACET];
 		while (actualFacetCount-- > 0 && fromfile.read(buffer, SIZE_OF_FACET))
