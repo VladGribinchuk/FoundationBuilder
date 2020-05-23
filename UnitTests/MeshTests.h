@@ -25,7 +25,8 @@ DEFINE_TEST_CASE(MeshReadASCII)
         f << stl_text;
     f.close();
 
-    Mesh mesh = MeshHandler::read("../test_models/square_unit_test_ascii.stl");
+    Mesh mesh;
+    mesh.read("../test_models/square_unit_test_ascii.stl");
     std::remove("../test_models/square_unit_test_ascii.stl");
 
     TEST_ASSERT((mesh.getModelName() == "square_unit_test" && mesh.size() == 2 &&
@@ -52,37 +53,26 @@ DEFINE_TEST_CASE(MeshReadBinary)
     {
         f.write(headerInfo, sizeof(headerInfo));
         f.write((char*)&nTriLong, 4);
-        for (int i = 0; i < 2; i++)
+        char buffer[50] = { 0 };
+        for (const auto& tri : facets)
         {
-            //normal
-            f.write((char*)&facets[i].a.x, 4);
-            f.write((char*)&facets[i].a.y, 4);
-            f.write((char*)&facets[i].a.z, 4);
-
-            //p1 coordinates
-            f.write((char*)&facets[i].a.x, 4);
-            f.write((char*)&facets[i].a.y, 4);
-            f.write((char*)&facets[i].a.z, 4);
-
-            //p2 coordinates
-            f.write((char*)&facets[i].b.x, 4);
-            f.write((char*)&facets[i].b.y, 4);
-            f.write((char*)&facets[i].b.z, 4);
-
-            //p3 coordinates
-            f.write((char*)&facets[i].c.x, 4);
-            f.write((char*)&facets[i].c.y, 4);
-            f.write((char*)&facets[i].c.z, 4);
-
-            f.write(attribute, 2);
+            float* ptr = ((float*)buffer);
+            FPoint3D normal = tri.getNormal();
+            *(ptr + 0) = normal.x;
+            *(ptr + 1) = normal.y;
+            *(ptr + 2) = normal.z;
+            ptr += 3;
+            *(ptr + 0) = tri.a.x; *(ptr + 1) = tri.a.y; *(ptr + 2) = tri.a.z;
+            *(ptr + 3) = tri.b.x; *(ptr + 4) = tri.b.y; *(ptr + 5) = tri.b.z;
+            *(ptr + 6) = tri.c.x; *(ptr + 7) = tri.c.y; *(ptr + 8) = tri.c.z;
+            f.write(buffer, sizeof(buffer));
         }
     }
     f.close();
 
 
-
-
-    Mesh mesh = MeshHandler::read("../test_models/square_unit_test_binary.stl");
+    Mesh mesh;
+    mesh.read("../test_models/square_unit_test_binary.stl");
     std::remove("../test_models/square_unit_test_binary.stl");
 
     TEST_ASSERT((mesh.size() == 2 &&
@@ -97,12 +87,12 @@ DEFINE_TEST_CASE(MeshReadBinary)
 }
 
 
-DEFINE_TEST_CASE(MeshWrite)
+DEFINE_TEST_CASE(MeshWriteASCII)
 {
     Mesh mesh;
     mesh.add({ {1, 1, 0 }, {0, 1, 0}, {0, 1, -1} });
     mesh.setModelName("square_unit_test");
-	MeshHandler::write("../test_models/square_unit_WriteTest_ascii.stl", mesh);
+	mesh.writeASCII("../test_models/square_unit_WriteTest_ascii.stl");
 
 
 	std::ifstream f("../test_models/square_unit_WriteTest_ascii.stl", std::ios::in);
@@ -114,4 +104,22 @@ DEFINE_TEST_CASE(MeshWrite)
 	TEST_CHECK((ss).str(), 
         std::string("solid square_unit_test\n facet normal -0 -1 0\n  outer loop\n  vertex 1 1 0\n  vertex 0 1 0\n  vertex 0 1 -1\n  endloop\n endfacet\n\nendsolid square_unit_test"), 
         "The written mesh is wrong!");
+}
+
+
+DEFINE_TEST_CASE(MeshWriteBinary)
+{
+    Mesh mesh;
+    mesh.add({ {1, 1, 0 }, {0, 1, 0}, {0, 1, -1} });
+    mesh.setModelName("square_unit_test");
+    mesh.writeBinary("../test_models/square_unit_WriteTest_binary.stl");
+
+    mesh.read("../test_models/square_unit_WriteTest_binary.stl");
+    std::remove("../test_models/square_unit_WriteTest_binary.stl");
+
+    TEST_ASSERT((mesh.size() == 1 &&
+        mesh[0].a.x == 1 && mesh[0].a.y == 1 && mesh[0].a.z == 0 &&
+        mesh[0].b.x == 0 && mesh[0].b.y == 1 && mesh[0].b.z == 0 &&
+        mesh[0].c.x == 0 && mesh[0].c.y == 1 && mesh[0].c.z == -1
+        ), "The written mesh is wrong!");
 }
