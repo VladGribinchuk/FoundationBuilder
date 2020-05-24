@@ -89,3 +89,66 @@ DEFINE_TEST_CASE(PolygonArea)
     Polygon p({ {2, 5}, {-3, 3}, {-4,-2}, {-4,-3}, {-2,-3}, {3,0} });
     TEST_ASSERT(p.area() == -36.5, "The area must be -36.500!");
 }
+
+DEFINE_TEST_CASE(PolygonEqual)
+{
+    Polygon p({ { 0, 0 }, { 0, 4 }, { 4, 4 }, { 4, 0 } });
+    Polygon p2({ { 0, 4 }, { 4, 4 }, { 4, 0 }, { 0, 0 } });
+
+    TEST_ASSERT(p == p2, "Polygons p and p2 must be equal");
+}
+
+DEFINE_TEST_CASE(PolygonNotEqual)
+{
+    Polygon p1({ { 0, 4 }, { 4, 4 }, { 4, 0 }, { 0, 0 } });
+    Polygon p2({ { 4, 4 }, { 4, 0 }, { 0, 0 } });
+    Polygon p3({ { 4, 4 }, { 0, 4 }, { 4, 0 }, { 0, 0 } });
+    
+    TEST_ASSERT(p1 != p2, "Polygons p1 and p2 must not be equal");
+    TEST_ASSERT(p1 != p3, "Polygons p1 and p3 must not be equal");
+}
+
+DEFINE_TEST_CASE(PolygonLength)
+{
+    Polygon p1({});
+    Polygon p2({ {1, 1} });
+    Polygon p3({ {1, 1}, {1, 3} });
+    Polygon p4({ {1, 1}, {1, 3}, {6, 3}, {6, 1} });
+
+    TEST_ASSERT(p1.polygonLength() == 0, "Polygon p1 length must be 0");
+    TEST_ASSERT(p2.polygonLength() == 0, "Polygon p2 length must be 0");
+    TEST_ASSERT(p3.polygonLength() == 2, "Polygon p3 length must be 2");
+    TEST_ASSERT(p4.polygonLength() == 14, "Polygon p4 length must be 14");
+    
+}
+
+DEFINE_TEST_CASE(PolygonCentroid) {
+    Polygon p1({ { 0, 4 }, { 4, 4 }, { 4, 0 }, { 0, 0 } });
+    Polygon p2({ {1, 0}, {2, 0}, {0, 3} });
+    Polygon p3({ {1, 0}, {2, 1}, {0, 3}, {-1, 2}, {-2, -1} });
+
+    TEST_ASSERT(p1.centroid() == FPoint2D(mm(2.00), mm(2.00)), "Polygon p1 centroid must be in point {2.00, 2.00}");
+    TEST_ASSERT(p2.centroid() == FPoint2D(mm(1.00), mm(1.00)), "Polygon p2 centroid must be in point {1.00, 1.00}");
+    TEST_ASSERT(p3.centroid() == FPoint2D(mm(-0.083), mm(0.917)), "Polygon p3 centroid must be in point {-0.083, 0.917}");
+}
+
+DEFINE_TEST_CASE(PolygonClosestTo)
+{
+    Polygon p1({ {0, 0}, {4, 2}, {6, 0} });
+    
+    FPoint2D point1(4.50, 0);
+    
+    TEST_ASSERT(p1.closestTo(point1) == FPoint2D(mm(6.00), mm(0.00)), "Closest point of p1 to point1 must be {6.00, 0.00}");
+}
+
+DEFINE_TEST_CASE(PolygonTranslate)
+{
+    Polygon p1({ {0, 0}, {3, 4}, {9, -3} });
+    Polygon p2({ {-1, 2}, {2, 6}, {8, -1} });
+    Polygon p3({});
+    Polygon p4({});
+    p1.translate(FPoint2D(mm(-1.00), mm(2.00)));
+    TEST_ASSERT(p1 == p2, "Polygon p1 after translation must be in place where is p2");
+    p3.translate(FPoint2D(mm(-1.00), mm(2.00)));
+    TEST_ASSERT(p3 == p4, "Empty polygon p3 after translation must be empty polygon");
+}
