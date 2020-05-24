@@ -94,6 +94,8 @@ namespace geom_utils
         static Polygon makePolygon(const Triangle2D& tri);
     };
 
+    bool operator==(const Polygon& lhs, const Polygon& rhs);
+    bool operator!=(const Polygon& lhs, const Polygon& rhs);
     // Polygon output/input operators
 
     inline std::string PolygonToString(const Polygon& poly)

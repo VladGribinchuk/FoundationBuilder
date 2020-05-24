@@ -6,18 +6,48 @@ namespace geom_utils
 {
     bool operator==(const Polygon& lhs, const Polygon& rhs) 
     { 
-        return {}; 
+        if (lhs.size() != rhs.size()) {
+            return false;
+        }
+        if (lhs.empty() && rhs.empty()) {
+            return true;
+        }
+        std::vector<FPoint2D>::const_iterator lhs_temp_point = lhs.begin();
+        auto rhs_temp_point = std::find(rhs.begin(), rhs.end(), *lhs_temp_point);
+        if (rhs_temp_point == rhs.end()) {
+            return false;
+        }
+        for (; lhs_temp_point != lhs.end(); ++lhs_temp_point, ++rhs_temp_point) {
+            if (rhs_temp_point == rhs.end()) {
+                rhs_temp_point = rhs.begin();
+            }
+            if (*lhs_temp_point != *rhs_temp_point) {
+                return false;
+            }
+        }
+        return true;
     }
 
     bool operator!=(const Polygon& lhs, const Polygon& rhs)
     {
-        return {};
+        return !(lhs == rhs);
     }
 
     // Return length of polyline, note that last and first point are considered as connected
     FPoint2D::coord Polygon::polygonLength() const 
-    { 
-        return {}; 
+    {
+        int size = points.size();
+        if (size < 2) {
+            return 0;
+        }
+        else if (size == 2) {
+            return distance(points[0], points[1]);
+        }
+        FPoint2D::coord length = 0;
+        for (int i = 0; i < size; ++i) {
+            length += distance(points[i], points[(i + 1) % size]);
+        }
+        return length;
     }
 
     // Calculate area of polygon
@@ -46,19 +76,47 @@ namespace geom_utils
 
     // Return center of mass of the polygon
     FPoint2D Polygon::centroid() const 
-    { 
-        return {}; 
+    {
+        int size = points.size();
+        if (size == 0) {
+            return FPoint2D();
+        }
+        FPoint2D center_of_mass(FPoint2D::coord(0.00), FPoint2D::coord(0.00));
+        FPoint2D::coord det = 0, temp_det = 0;
+        int j = 0;
+        for (int i = 0; i < size; ++i){
+            j = (i + 1) % size;
+            temp_det = cross(points[i], points[j]);
+            det += temp_det;
+            center_of_mass.x += (points[i].x + points[j].x) * temp_det;
+            center_of_mass.y += (points[i].y + points[j].y) * temp_det;
+        }
+        FPoint2D::coord full_polygon_mass = 3 * det;
+        center_of_mass.x /= full_polygon_mass;
+        center_of_mass.y /= full_polygon_mass;
+
+        return center_of_mass;
     }
 
     // Return closest point in the polygon vertices to the given point p
     FPoint2D Polygon::closestTo(const FPoint2D& p) const 
-    { 
-        return {}; 
+    {
+        int size = points.size();
+        if (size == 0) {
+            return FPoint2D();
+        }
+        std::vector<FPoint2D::coord> distances(size);
+        #pragma omp parallel for
+        for (int i = 0; i < size; ++i) {
+            distances[i] = distance(points[i], p);
+        }
+        return points[std::distance(distances.begin(), min_element(distances.begin(), distances.end()))];
     }
 
     // Translate polygon to the given point
     void Polygon::translate(const FPoint2D& p) 
     {
+        std::for_each(points.begin(), points.end(), [&](FPoint2D& n) { n += p; });
     }
 
 
