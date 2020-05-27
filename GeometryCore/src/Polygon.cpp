@@ -130,24 +130,30 @@ namespace geom_utils
     Polygon Polygon::convexHull() const 
     { 
         if (points.size() <= 3) return *this; //can't bild a polygon from 2 points or less
+
+        auto my_cross = [](const FPoint2D& O, const FPoint2D& A, const FPoint2D& B) {return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x); };
+        auto lexicographicallyPred = [](const FPoint2D& a, const FPoint2D& b) {return a.x < b.x || (a.x == b.x && a.y < b.y); };
+
+        size_t k = 0;
         Polygon convexHull;
-        auto pos_of_the_most_right_point = std::min_element(points.begin(), points.end(), [](auto a, auto b) {return b.x > a.x; }) - points.begin();
-        int pos_of_cur_point = pos_of_the_most_right_point;
+        convexHull.points.resize(2 * this->points.size());
 
-        do
-        {
-            convexHull.points.push_back(points[pos_of_cur_point]);
-            int pos_of_next_point = (pos_of_cur_point + 1) % points.size();
+        // Sort points lexicographically
+        auto pointsCopy = this->points;
+        std::sort(pointsCopy.begin(), pointsCopy.end(), lexicographicallyPred);
 
-            for (int i = 0; i < points.size(); i++)
-            {   //find the most counter-clockwise point
-                Polygon tmp_poly({ points[pos_of_cur_point], points[i], points[pos_of_next_point] });
-                if (tmp_poly.orientation())
-                    pos_of_next_point = i;
-            }
-            pos_of_cur_point = pos_of_next_point;
+        // Build lower hull
+        for (size_t i = 0; i < pointsCopy.size(); ++i) {
+            while (k >= 2 && my_cross(convexHull.points[k - 2], convexHull.points[k - 1], pointsCopy[i]) <= 0) k--;
+            convexHull.points[k++] = pointsCopy[i];
+        }
 
-        } while (pos_of_cur_point != pos_of_the_most_right_point);
+        // Build upper hull
+        for (size_t i = pointsCopy.size() - 1, t = k + 1; i > 0; --i) {
+            while (k >= t && my_cross(convexHull.points[k - 2], convexHull.points[k - 1], pointsCopy[i - 1]) <= 0) k--;
+            convexHull.points[k++] = pointsCopy[i - 1];
+        }
+        convexHull.points.resize(k - 1);
 
         return convexHull;
     }
