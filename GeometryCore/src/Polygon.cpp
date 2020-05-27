@@ -131,9 +131,7 @@ namespace geom_utils
     { 
         if (points.size() <= 3) return *this; //can't bild a polygon from 2 points or less
 
-        auto my_cross = [](const FPoint2D& O, const FPoint2D& A, const FPoint2D& B) {return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x); };
         auto lexicographicallyPred = [](const FPoint2D& a, const FPoint2D& b) {return a.x < b.x || (a.x == b.x && a.y < b.y); };
-
         size_t k = 0;
         Polygon convexHull;
         convexHull.points.resize(2 * this->points.size());
@@ -144,13 +142,13 @@ namespace geom_utils
 
         // Build lower hull
         for (size_t i = 0; i < pointsCopy.size(); ++i) {
-            while (k >= 2 && my_cross(convexHull.points[k - 2], convexHull.points[k - 1], pointsCopy[i]) <= 0) k--;
+            while (k >= 2 && geom_utils::cross(FPoint2D(convexHull.points[k - 2] - pointsCopy[i]), FPoint2D(convexHull.points[k - 1] - pointsCopy[i])) <= 0) k--;
             convexHull.points[k++] = pointsCopy[i];
         }
 
         // Build upper hull
         for (size_t i = pointsCopy.size() - 1, t = k + 1; i > 0; --i) {
-            while (k >= t && my_cross(convexHull.points[k - 2], convexHull.points[k - 1], pointsCopy[i - 1]) <= 0) k--;
+            while (k >= t && geom_utils::cross(FPoint2D(convexHull.points[k - 2] - pointsCopy[i - 1]), FPoint2D(convexHull.points[k - 1] - pointsCopy[i - 1])) <= 0) k--;
             convexHull.points[k++] = pointsCopy[i - 1];
         }
         convexHull.points.resize(k - 1);
