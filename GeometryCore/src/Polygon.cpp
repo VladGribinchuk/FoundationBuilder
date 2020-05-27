@@ -142,13 +142,13 @@ namespace geom_utils
 
         // Build lower hull
         for (size_t i = 0; i < pointsCopy.size(); ++i) {
-            while (k >= 2 && geom_utils::cross(FPoint2D(convexHull.points[k - 2] - pointsCopy[i]), FPoint2D(convexHull.points[k - 1] - pointsCopy[i])) <= 0) k--;
+            while (k >= 2 && geom_utils::cross(FPoint2D(convexHull.points[k - 1] - convexHull.points[k - 2]), FPoint2D(pointsCopy[i] - convexHull.points[k - 2])) <= 0) k--;
             convexHull.points[k++] = pointsCopy[i];
         }
 
         // Build upper hull
         for (size_t i = pointsCopy.size() - 1, t = k + 1; i > 0; --i) {
-            while (k >= t && geom_utils::cross(FPoint2D(convexHull.points[k - 2] - pointsCopy[i - 1]), FPoint2D(convexHull.points[k - 1] - pointsCopy[i - 1])) <= 0) k--;
+            while (k >= t && geom_utils::cross(FPoint2D(convexHull.points[k - 1] - convexHull.points[k - 2]), FPoint2D(pointsCopy[i - 1] - convexHull.points[k - 2])) <= 0) k--;
             convexHull.points[k++] = pointsCopy[i - 1];
         }
         convexHull.points.resize(k - 1);
