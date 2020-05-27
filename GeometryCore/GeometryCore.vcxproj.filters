@@ -64,5 +64,8 @@
     <ClCompile Include="src\Units.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Triangle.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

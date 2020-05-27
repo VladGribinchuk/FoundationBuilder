@@ -157,6 +157,7 @@
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Polygon.cpp" />
     <ClCompile Include="src\SVGWriter.cpp" />
+    <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\Units.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

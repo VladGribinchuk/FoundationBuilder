@@ -6,22 +6,52 @@ namespace geom_utils
 {
     bool operator==(const Polygon& lhs, const Polygon& rhs) 
     { 
-        return {}; 
+        if (lhs.size() != rhs.size()) {
+            return false;
+        }
+        if (lhs.empty() && rhs.empty()) {
+            return true;
+        }
+        std::vector<FPoint2D>::const_iterator lhs_temp_point = lhs.begin();
+        auto rhs_temp_point = std::find(rhs.begin(), rhs.end(), *lhs_temp_point);
+        if (rhs_temp_point == rhs.end()) {
+            return false;
+        }
+        for (; lhs_temp_point != lhs.end(); ++lhs_temp_point, ++rhs_temp_point) {
+            if (rhs_temp_point == rhs.end()) {
+                rhs_temp_point = rhs.begin();
+            }
+            if (*lhs_temp_point != *rhs_temp_point) {
+                return false;
+            }
+        }
+        return true;
     }
 
     bool operator!=(const Polygon& lhs, const Polygon& rhs)
     {
-        return {};
+        return !(lhs == rhs);
     }
 
     // Return length of polyline, note that last and first point are considered as connected
     FPoint2D::coord Polygon::polygonLength() const 
-    { 
-        return {}; 
+    {
+        int size = points.size();
+        if (size < 2) {
+            return 0;
+        }
+        else if (size == 2) {
+            return distance(points[0], points[1]);
+        }
+        FPoint2D::coord length = 0;
+        for (int i = 0; i < size; ++i) {
+            length += distance(points[i], points[(i + 1) % size]);
+        }
+        return length;
     }
 
     // Calculate area of polygon
-    inline FPoint2D::coord Polygon::area() const 
+    FPoint2D::coord Polygon::area() const 
     { 
         if (this->points.size() < 3) return 0; //can't measure an area of a line or point
         float res = 0.0;
@@ -46,19 +76,47 @@ namespace geom_utils
 
     // Return center of mass of the polygon
     FPoint2D Polygon::centroid() const 
-    { 
-        return {}; 
+    {
+        int size = points.size();
+        if (size == 0) {
+            return FPoint2D();
+        }
+        FPoint2D center_of_mass(FPoint2D::coord(0.00), FPoint2D::coord(0.00));
+        FPoint2D::coord det = 0, temp_det = 0;
+        int j = 0;
+        for (int i = 0; i < size; ++i){
+            j = (i + 1) % size;
+            temp_det = cross(points[i], points[j]);
+            det += temp_det;
+            center_of_mass.x += (points[i].x + points[j].x) * temp_det;
+            center_of_mass.y += (points[i].y + points[j].y) * temp_det;
+        }
+        FPoint2D::coord full_polygon_mass = 3 * det;
+        center_of_mass.x /= full_polygon_mass;
+        center_of_mass.y /= full_polygon_mass;
+
+        return center_of_mass;
     }
 
     // Return closest point in the polygon vertices to the given point p
     FPoint2D Polygon::closestTo(const FPoint2D& p) const 
-    { 
-        return {}; 
+    {
+        int size = points.size();
+        if (size == 0) {
+            return FPoint2D();
+        }
+        std::vector<FPoint2D::coord> distances(size);
+        #pragma omp parallel for
+        for (int i = 0; i < size; ++i) {
+            distances[i] = distance(points[i], p);
+        }
+        return points[std::distance(distances.begin(), min_element(distances.begin(), distances.end()))];
     }
 
     // Translate polygon to the given point
     void Polygon::translate(const FPoint2D& p) 
     {
+        std::for_each(points.begin(), points.end(), [&](FPoint2D& n) { n += p; });
     }
 
 
@@ -72,24 +130,28 @@ namespace geom_utils
     Polygon Polygon::convexHull() const 
     { 
         if (points.size() <= 3) return *this; //can't bild a polygon from 2 points or less
+
+        auto lexicographicallyPred = [](const FPoint2D& a, const FPoint2D& b) {return a.x < b.x || (a.x == b.x && a.y < b.y); };
+        size_t k = 0;
         Polygon convexHull;
-        auto pos_of_the_most_right_point = std::min_element(points.begin(), points.end(), [](auto a, auto b) {return b.x > a.x; }) - points.begin();
-        int pos_of_cur_point = pos_of_the_most_right_point;
+        convexHull.points.resize(2 * this->points.size());
 
-        do
-        {
-            convexHull.points.push_back(points[pos_of_cur_point]);
-            int pos_of_next_point = (pos_of_cur_point + 1) % points.size();
+        // Sort points lexicographically
+        auto pointsCopy = this->points;
+        std::sort(pointsCopy.begin(), pointsCopy.end(), lexicographicallyPred);
 
-            for (int i = 0; i < points.size(); i++)
-            {   //find the most counter-clockwise point
-                Polygon tmp_poly({ points[pos_of_cur_point], points[i], points[pos_of_next_point] });
-                if (tmp_poly.orientation())
-                    pos_of_next_point = i;
-            }
-            pos_of_cur_point = pos_of_next_point;
+        // Build lower hull
+        for (size_t i = 0; i < pointsCopy.size(); ++i) {
+            while (k >= 2 && geom_utils::cross(FPoint2D(convexHull.points[k - 1] - convexHull.points[k - 2]), FPoint2D(pointsCopy[i] - convexHull.points[k - 2])) <= 0) k--;
+            convexHull.points[k++] = pointsCopy[i];
+        }
 
-        } while (pos_of_cur_point != pos_of_the_most_right_point);
+        // Build upper hull
+        for (size_t i = pointsCopy.size() - 1, t = k + 1; i > 0; --i) {
+            while (k >= t && geom_utils::cross(FPoint2D(convexHull.points[k - 1] - convexHull.points[k - 2]), FPoint2D(pointsCopy[i - 1] - convexHull.points[k - 2])) <= 0) k--;
+            convexHull.points[k++] = pointsCopy[i - 1];
+        }
+        convexHull.points.resize(k - 1);
 
         return convexHull;
     }
