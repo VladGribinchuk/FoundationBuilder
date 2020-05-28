@@ -177,8 +177,30 @@ namespace geom_utils
     // For non-convex polygons it should return just empty vector.
     std::vector<Triangle2D> Polygon::triangulate() const
     {
-        return {}; 
+        std::vector <Triangle2D> vectorForTriangulate;
+
+       // FPoint2D centerPoly = centroid();
+       // FPoint2D  firstVertex =  pointsCopy[0];
+        if (points.size() >= 4) {
+            if (isConvexHull())
+            {
+              //  auto vertexSortingCondition = [](const FPoint2D& a, const FPoint2D& b) {return a.x < b.x || (a.x == b.x && a.y < b.y); };
+                auto pointsCopy = this->points;
+                //std::sort(pointsCopy.begin(), pointsCopy.end(), vertexSortingCondition);
+                FPoint2D  firstVertex =  pointsCopy[0];
+                for (int i = 0; i < pointsCopy.size() - 2 ; i++)
+                {
+                   
+                    Triangle2D tri = { pointsCopy[(i + 1) % pointsCopy.size()] ,firstVertex,pointsCopy[(i+2) % pointsCopy.size()] };
+                    vectorForTriangulate.push_back(tri);
+                }
+                return vectorForTriangulate;
+            }
+            else return vectorForTriangulate;
+
+        }
     }
+
 
     Polygon Polygon::makePolygon(const Triangle2D& tri) 
     { 

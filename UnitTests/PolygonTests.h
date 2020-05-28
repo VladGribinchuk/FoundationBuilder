@@ -1,6 +1,7 @@
 #pragma once
 #include "UnitTests.h"
 #include "../GeometryCore/include/Polygon.h"
+#include "../GeometryCore/include/Triangle.h"
 
 using namespace geom_utils;
 
@@ -151,4 +152,44 @@ DEFINE_TEST_CASE(PolygonTranslate)
     TEST_ASSERT(p1 == p2, "Polygon p1 after translation must be in place where is p2");
     p3.translate(FPoint2D(mm(-1.00), mm(2.00)));
     TEST_ASSERT(p3 == p4, "Empty polygon p3 after translation must be empty polygon");
+}
+
+
+DEFINE_TEST_CASE(PolygonTriangulation)
+{
+    Polygon poly ({ {-3,-4},{-4, 0}, {0, 4}, {4,0}, {3,-4} });
+
+
+    // {-4,0}, {-3,-4},{0, 4}, {4, 0}, {3,-4}
+
+    /*std::vector <Triangle2D> vectorForTriangulate = { 
+        Triangle2D(FPoint2D(-3,-4),FPoint2D(0,0),FPoint2D(-4,0)), 
+        Triangle2D(FPoint2D(-4,0),FPoint2D(0,0),FPoint2D(0,4)), 
+        Triangle2D(FPoint2D(0,4),FPoint2D(0,0),FPoint2D(4,0)),
+        Triangle2D(FPoint2D(4,0),FPoint2D(0,0),FPoint2D(3,-4)),
+        Triangle2D(FPoint2D(3,-4),FPoint2D(0,0),FPoint2D(-3,-4))
+    };*/
+    std::vector <Triangle2D> vectorForTriangulate = {
+        Triangle2D(FPoint2D(-4,0),FPoint2D(-3,-4),FPoint2D(0,4)),
+        Triangle2D(FPoint2D(0,4),FPoint2D(-3,-4),FPoint2D(4,0)),
+        Triangle2D(FPoint2D(4,0),FPoint2D(-3,-4),FPoint2D(3,-4))
+    };
+
+
+    std::vector<Triangle2D> tris = poly.triangulate();
+
+
+   /* TEST_ASSERT(
+        tris[0].a == vectorForTriangulate[0].a && tris[0].b == vectorForTriangulate[0].b && tris[0].c == vectorForTriangulate[0].c && 
+        tris[1].a == vectorForTriangulate[1].a && tris[1].b == vectorForTriangulate[1].b && tris[1].c == vectorForTriangulate[1].c &&
+        tris[2].a == vectorForTriangulate[2].a && tris[2].b == vectorForTriangulate[2].b && tris[2].c == vectorForTriangulate[2].c &&
+        tris[3].a == vectorForTriangulate[3].a && tris[3].b == vectorForTriangulate[3].b && tris[3].c == vectorForTriangulate[3].c &&
+        tris[4].a == vectorForTriangulate[4].a && tris[4].b == vectorForTriangulate[4].b && tris[4].c == vectorForTriangulate[4].c &&
+        tris[5].a == vectorForTriangulate[5].a && tris[5].b == vectorForTriangulate[5].b && tris[5].c == vectorForTriangulate[5].c, 
+        "Failed");*/
+    TEST_ASSERT(
+        tris[0].a == vectorForTriangulate[0].a && tris[0].b == vectorForTriangulate[0].b && tris[0].c == vectorForTriangulate[0].c &&
+        tris[1].a == vectorForTriangulate[1].a && tris[1].b == vectorForTriangulate[1].b && tris[1].c == vectorForTriangulate[1].c &&
+        tris[2].a == vectorForTriangulate[2].a && tris[2].b == vectorForTriangulate[2].b && tris[2].c == vectorForTriangulate[2].c ,
+        "Failed");
 }
