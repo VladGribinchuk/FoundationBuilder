@@ -5,7 +5,7 @@
 namespace geom_utils
 {
     SVGWriter::SVGWriter(std::string filename, AABB2D aabb, double xSize, double ySize)
-        : aabb(aabb), scale(std::min(float(xSize - xSize / 5 * 2) / (aabb.max().x - aabb.min().x), float(ySize - ySize / 5) / (aabb.max().y - aabb.min().y)))
+        : aabb(aabb), xSize(xSize), ySize(ySize), scale(std::min(float(xSize - xSize / 5 * 2) / (aabb.max().x - aabb.min().x), float(ySize - ySize / 5) / (aabb.max().y - aabb.min().y)))
     {
         file.open(filename.c_str(), std::ios_base::out);
         if (file.is_open())
@@ -13,8 +13,8 @@ namespace geom_utils
             file << std::fixed;
             file << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
             file << "<svg \nxmlns=\"http://www.w3.org/2000/svg\"\nxmlns:inkscape=\"http://www.inkscape.org/namespaces/inkscape\"\n";
-            file << "height=\"" << scale * (aabb.max().y - aabb.min().y) << "\"\n";
-            file << "width=\"" << scale * (aabb.max().x - aabb.min().x) << "\"\n";
+            file << "height=\"" << xSize << "\"\n";
+            file << "width=\"" << ySize << "\"\n";
             file << "version=\"1.1\">\n<g\ninkscape:groupmode=\"layer\"\ninkscape:label=\"layer" << 1 << "\"\nid=\"" << 1 << "\">\n";
         }
     }
@@ -40,5 +40,4 @@ namespace geom_utils
         b = transform(b);
         file << "<line x1=\"" << a.x << "\" y1=\"" << a.y << "\" x2=\"" << b.x << "\" y2=\"" << b.y << "\" style=\"stroke:" << toString(color).c_str() << ";stroke-width:" << stroke << "\" />\n";
     }
-
 }
