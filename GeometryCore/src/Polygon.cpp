@@ -121,37 +121,33 @@ namespace geom_utils
     }
 
 
-    float Polygon::perpendicularDistance(const FPoint2D& pointsList,const FPoint2D& lineStart, const FPoint2D& lineEnd)
+    float Polygon::perpendicularDistance(const FPoint2D& point,const FPoint2D& lineStart, const FPoint2D& lineEnd)
     {
-        float dx = lineEnd.x - lineStart.x;
-        float dy = lineEnd.y - lineStart.y;
-
+        FPoint2D dpoint (lineEnd - lineStart); 
         //Normalise
-        float mag = pow(pow(dx, 2.0) + pow(dy, 2.0), 0.5);
-        if (mag > 0.0)
+        float dist = distance(lineEnd, lineStart);
+        //Normalise
+        
+        if (dist > 0.0)
         {
-            dx /= mag; 
-            dy /= mag;
+            dpoint.x /= dist;
+            dpoint.y /= dist;
         }
 
-        float pvx = pointsList.x - lineStart.x;
-        float pvy = pointsList.y - lineStart.y;
+        FPoint2D pv(point-lineStart);
 
         //Get dot product (project pv onto normalized direction)
-        float pvdot = dx * pvx + dy * pvy;
-
+        float pvdot = dot(dpoint,pv);
+       
         //Scale line direction vector
-        float dsx = pvdot * dx;
-        float dsy = pvdot * dy;
+        FPoint2D ds(pvdot * dpoint.x, pvdot * dpoint.y);
 
-        //Subtract this from pointsList
-        float ax = pvx - dsx;
-        float ay = pvy - dsy;
+        //Subtract this from pointv
+        FPoint2D ap(pv.x - ds.x, pv.y - ds.y);
 
-        return pow(pow(ax, 2.0) + pow(ay, 2.0), 0.5);
-    
+        return distance(pv,ds);
     }
-    void Polygon::recursiveAlgorithmForSimplify(const std::vector<FPoint2D>& pointList, const FPoint2D::coord smallestLineLength, std::vector<FPoint2D>& out)
+    void Polygon::algorithmSimplify(const std::vector<FPoint2D>& pointList, const FPoint2D::coord smallestLineLength, std::vector<FPoint2D>& out)
     {
             float dmax = 0.0;
             int index = 0;
@@ -175,8 +171,8 @@ namespace geom_utils
                std:: vector<FPoint2D> recResults2;
                std:: vector<FPoint2D> firstLine(pointList.begin(), pointList.begin() + index + 1);
                std::vector<FPoint2D> lastLine(pointList.begin() + index, pointList.end());
-               recursiveAlgorithmForSimplify(firstLine,smallestLineLength, recResults1);
-               recursiveAlgorithmForSimplify(lastLine, smallestLineLength, recResults2);
+               algorithmSimplify(firstLine,smallestLineLength, recResults1);
+               algorithmSimplify(lastLine, smallestLineLength, recResults2);
                // Build the result list
                out.assign(recResults1.begin(), recResults1.end() - 1);
                out.insert(out.end(), recResults2.begin(), recResults2.end());
@@ -200,7 +196,7 @@ namespace geom_utils
         if (points.size() > 2) 
         {
             std::vector<FPoint2D> out;
-            recursiveAlgorithmForSimplify(points, smallestLineLength, out);
+            algorithmSimplify(points, smallestLineLength, out);
             if (out.size() > 2)
             {
               points.swap(out);
