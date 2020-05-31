@@ -81,6 +81,12 @@ namespace geom_utils
         // Result will recall smth like re-connecting points process.
         void simplify(const FPoint2D::coord smallestLineLength);
 
+        //Calculate perpendicular distance to smallestLineLength
+        float perpendicularDistance(const FPoint2D& p, const FPoint2D& lineStart, const FPoint2D& lineEnd);
+
+        // Recursive algorithm for simplify polygon
+        void recursiveAlgorithmForSimplify(const std::vector<FPoint2D> &pointList, const FPoint2D::coord smallestLineLength, std::vector<FPoint2D> &out);
+
         // Calculate and return convex hull for the polygon
         Polygon convexHull() const;
 

@@ -2,6 +2,7 @@
 #include "../include/Triangle.h"
 #include "../include/LinearAlgebra.h"
 
+
 namespace geom_utils
 {
     bool operator==(const Polygon& lhs, const Polygon& rhs) 
@@ -120,10 +121,92 @@ namespace geom_utils
     }
 
 
+    float Polygon::perpendicularDistance(const FPoint2D& pointsList,const FPoint2D& lineStart, const FPoint2D& lineEnd)
+    {
+        float dx = lineEnd.x - lineStart.x;
+        float dy = lineEnd.y - lineStart.y;
+
+        //Normalise
+        float mag = pow(pow(dx, 2.0) + pow(dy, 2.0), 0.5);
+        if (mag > 0.0)
+        {
+            dx /= mag; 
+            dy /= mag;
+        }
+
+        float pvx = pointsList.x - lineStart.x;
+        float pvy = pointsList.y - lineStart.y;
+
+        //Get dot product (project pv onto normalized direction)
+        float pvdot = dx * pvx + dy * pvy;
+
+        //Scale line direction vector
+        float dsx = pvdot * dx;
+        float dsy = pvdot * dy;
+
+        //Subtract this from pointsList
+        float ax = pvx - dsx;
+        float ay = pvy - dsy;
+
+        return pow(pow(ax, 2.0) + pow(ay, 2.0), 0.5);
+    
+    }
+    void Polygon::recursiveAlgorithmForSimplify(const std::vector<FPoint2D>& pointList, const FPoint2D::coord smallestLineLength, std::vector<FPoint2D>& out)
+    {
+            float dmax = 0.0;
+            int index = 0;
+            int end = pointList.size() - 1;
+
+            for (int i = 1; i < pointList.size() - 1; i++)
+            {
+                float d = perpendicularDistance(pointList[i], pointList[0], pointList[end]);
+                if (d > dmax)
+                {
+                    index = i;
+                    dmax = d;
+                }
+
+            }
+
+            if (dmax > smallestLineLength)
+            {
+               // Recursive call
+               std:: vector<FPoint2D> recResults1;
+               std:: vector<FPoint2D> recResults2;
+               std:: vector<FPoint2D> firstLine(pointList.begin(), pointList.begin() + index + 1);
+               std::vector<FPoint2D> lastLine(pointList.begin() + index, pointList.end());
+               recursiveAlgorithmForSimplify(firstLine,smallestLineLength, recResults1);
+               recursiveAlgorithmForSimplify(lastLine, smallestLineLength, recResults2);
+               // Build the result list
+               out.assign(recResults1.begin(), recResults1.end() - 1);
+               out.insert(out.end(), recResults2.begin(), recResults2.end());
+
+            }
+            else
+            {
+                //Just return start and end points
+                out.clear();
+                out.push_back(pointList[0]);
+                out.push_back(pointList[end]);
+
+            }
+        
+   }
+
     // Remove line segments which are smaller than the provided smallestLineLength value.
     // Result will recall smth like re-connecting points process.
     void Polygon::simplify(const FPoint2D::coord smallestLineLength) 
     {
+        if (points.size() > 2) 
+        {
+            std::vector<FPoint2D> out;
+            recursiveAlgorithmForSimplify(points, smallestLineLength, out);
+            if (out.size() > 2)
+            {
+              points.swap(out);
+              out.clear();
+            }
+        }
     }
 
     // Calculate and return convex hull for the polygon
@@ -178,12 +261,9 @@ namespace geom_utils
     std::vector<Triangle2D> Polygon::triangulate() const
     {
         std::vector <Triangle2D> vectorForTriangulate;
-
-     
-        if (points.size() >= 4) {
+        if (points.size() > 2) {
             if (isConvexHull())
             {
-           
                 FPoint2D  firstVertex =  points[0];
                 for (int i = 0; i < points.size() - 2 ; i++)
                 {
@@ -191,10 +271,9 @@ namespace geom_utils
                     Triangle2D tri = {points[(i + 2) % points.size()] ,firstVertex, points[(i+1) % points.size()] };
                     vectorForTriangulate.push_back(tri);
                 }
-            }
-            return vectorForTriangulate;
-
+            }         
         }
+        return vectorForTriangulate;
     }
 
 
