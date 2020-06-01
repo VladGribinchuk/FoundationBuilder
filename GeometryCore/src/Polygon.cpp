@@ -1,6 +1,8 @@
 #include "../include/Polygon.h"
 #include "../include/Triangle.h"
 #include "../include/LinearAlgebra.h"
+#include "../include/LineSegment.h"
+
 
 namespace geom_utils
 {
@@ -119,11 +121,63 @@ namespace geom_utils
         std::for_each(points.begin(), points.end(), [&](FPoint2D& n) { n += p; });
     }
 
-
-    // Remove line segments which are smaller than the provided smallestLineLength value.
-    // Result will recall smth like re-connecting points process.
-    void Polygon::simplify(const FPoint2D::coord smallestLineLength) 
+    // Builds a new curve with fever points
+    //The algorithm defines 'dissimilar' based on the maximum distance between the original curve and the simplified curve (i.e., the Hausdorff distance between the curves)
+    //Link - https://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm
+    void Polygon::simplifyRamerDouglasPeucker(const std::vector<FPoint2D>& pointList, const FPoint2D::coord epsilon, std::vector<FPoint2D>& out)
     {
+            float dmax = 0.0;
+            int index = 0;
+            int end = pointList.size() - 1;
+
+            for (int i = 1; i < pointList.size() - 1; i++)
+            {
+                LineSegment2D line(pointList[0], pointList[end]);
+                float d = distanceFromPointToLine(pointList[i], line);
+                if (d > dmax)
+                {
+                    index = i;
+                    dmax = d;
+                }
+
+            }
+            if (dmax > epsilon)
+            {
+               // Recursive call
+               std:: vector<FPoint2D> recResults1;
+               std:: vector<FPoint2D> recResults2;
+               std:: vector<FPoint2D> firstLine(pointList.begin(), pointList.begin() + index + 1);
+               std::vector<FPoint2D> lastLine(pointList.begin() + index, pointList.end());
+               simplifyRamerDouglasPeucker(firstLine, epsilon, recResults1);
+               simplifyRamerDouglasPeucker(lastLine, epsilon, recResults2);
+               // Build the result list
+               out.assign(recResults1.begin(), recResults1.end() - 1);
+               out.insert(out.end(), recResults2.begin(), recResults2.end());
+
+            }
+            else
+            {
+                //Just return start and end points
+                out.clear();
+                out.push_back(pointList[0]);
+                out.push_back(pointList[end]);
+
+            }
+   }
+
+    //simplifies polygon based on Ramer–Douglas–Peucker algorithm
+    void Polygon::simplify(const FPoint2D::coord epsilon)
+    {
+        if (points.size() > 2) 
+        {
+            std::vector<FPoint2D> out;
+            simplifyRamerDouglasPeucker(points, epsilon, out);
+            if (out.size() > 2)
+            {
+              points.swap(out);
+              out.clear();
+            }
+        }
     }
 
     // Calculate and return convex hull for the polygon
@@ -177,8 +231,20 @@ namespace geom_utils
     // For non-convex polygons it should return just empty vector.
     std::vector<Triangle2D> Polygon::triangulate() const
     {
-        return {}; 
+        std::vector <Triangle2D> vectorForTriangulate;
+        if (isConvexHull())
+            {
+                FPoint2D  firstVertex =  points[0];
+                for (int i = 0; i < points.size() - 2 ; i++)
+                {
+                   
+                    Triangle2D tri = {points[(i + 2) % points.size()] ,firstVertex, points[(i+1) % points.size()] };
+                    vectorForTriangulate.push_back(tri);
+                }
+            }         
+        return vectorForTriangulate;
     }
+
 
     Polygon Polygon::makePolygon(const Triangle2D& tri) 
     { 

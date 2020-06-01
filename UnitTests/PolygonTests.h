@@ -1,6 +1,7 @@
 #pragma once
 #include "UnitTests.h"
 #include "../GeometryCore/include/Polygon.h"
+#include "../GeometryCore/include/Triangle.h"
 
 using namespace geom_utils;
 
@@ -152,3 +153,30 @@ DEFINE_TEST_CASE(PolygonTranslate)
     p3.translate(FPoint2D(mm(-1.00), mm(2.00)));
     TEST_ASSERT(p3 == p4, "Empty polygon p3 after translation must be empty polygon");
 }
+
+
+DEFINE_TEST_CASE(PolygonTriangulation)
+{
+    Polygon poly ({ {-3,-4},{-4, 0}, {0, 4}, {4,0}, {3,-4} });
+
+    std::vector <Triangle2D> vectorForTriangulate = {
+        Triangle2D(FPoint2D(0,4),FPoint2D(-3,-4),FPoint2D(-4,0)),
+        Triangle2D(FPoint2D(4,0),FPoint2D(-3,-4),FPoint2D(0,4)),
+        Triangle2D(FPoint2D(3,-4),FPoint2D(-3,-4),FPoint2D(4,0))
+    };
+
+    std::vector<Triangle2D> tris = poly.triangulate();
+    TEST_ASSERT(
+        tris[0].a == vectorForTriangulate[0].a && tris[0].b == vectorForTriangulate[0].b && tris[0].c == vectorForTriangulate[0].c &&
+        tris[1].a == vectorForTriangulate[1].a && tris[1].b == vectorForTriangulate[1].b && tris[1].c == vectorForTriangulate[1].c &&
+        tris[2].a == vectorForTriangulate[2].a && tris[2].b == vectorForTriangulate[2].b && tris[2].c == vectorForTriangulate[2].c ,
+        "Failed");
+}
+DEFINE_TEST_CASE(PolygonSimplify)
+{
+    Polygon polyIn({ {0,0}, {1, 0.1}, {2, -0.1}, {3,5}, {4,6}, {5,7}, {6,8.1}, {7,9}, {8,9}, {9,9} });
+    Polygon polyOut({ {0,0}, {2,-0.1}, {3,5}, {6,8.1}, {9,9} });
+    polyIn.simplify(1.0);
+    TEST_ASSERT(polyIn == polyOut,"Failed In != Out");
+}
+

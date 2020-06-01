@@ -77,9 +77,8 @@ namespace geom_utils
         // Translate polygon to the given point
         void translate(const FPoint2D& p);
 
-        // Remove line segments which are smaller than the provided smallestLineLength value.
-        // Result will recall smth like re-connecting points process.
-        void simplify(const FPoint2D::coord smallestLineLength);
+        //simplifies polygon based on Ramer–Douglas–Peucker algorithm
+        void simplify(const FPoint2D::coord epsilon);
 
         // Calculate and return convex hull for the polygon
         Polygon convexHull() const;
@@ -92,6 +91,12 @@ namespace geom_utils
         std::vector<Triangle2D> triangulate() const;
 
         static Polygon makePolygon(const Triangle2D& tri);
+       
+    private:
+        // Builds a new curve with fever points
+        //The algorithm defines 'dissimilar' based on the maximum distance between the original curve and the simplified curve (i.e., the Hausdorff distance between the curves)
+        //Link - https://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm
+        void simplifyRamerDouglasPeucker(const std::vector<FPoint2D>& pointList, const FPoint2D::coord epsilon, std::vector<FPoint2D>& out);
     };
 
     bool operator==(const Polygon& lhs, const Polygon& rhs);
