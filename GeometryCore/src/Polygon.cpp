@@ -232,7 +232,6 @@ namespace geom_utils
     std::vector<Triangle2D> Polygon::triangulate() const
     {
         std::vector <Triangle2D> vectorForTriangulate;
-
         if (isConvexHull())
             {
                 FPoint2D  firstVertex =  points[0];
