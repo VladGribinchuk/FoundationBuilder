@@ -1,6 +1,7 @@
 #include "../include/Polygon.h"
 #include "../include/Triangle.h"
 #include "../include/LinearAlgebra.h"
+#include "../include/LineSegment.h"
 
 
 namespace geom_utils
@@ -120,33 +121,6 @@ namespace geom_utils
         std::for_each(points.begin(), points.end(), [&](FPoint2D& n) { n += p; });
     }
 
-
-    float Polygon::perpendicularDistance(const FPoint2D& point,const FPoint2D& lineStart, const FPoint2D& lineEnd)
-    {
-        FPoint2D dpoint (lineEnd - lineStart); 
-        //Normalise
-        float dist = distance(lineEnd, lineStart);
-        //Normalise
-        
-        if (dist > 0.0)
-        {
-            dpoint.x /= dist;
-            dpoint.y /= dist;
-        }
-
-        FPoint2D pv(point-lineStart);
-
-        //Get dot product (project pv onto normalized direction)
-        float pvdot = dot(dpoint,pv);
-       
-        //Scale line direction vector
-        FPoint2D ds(pvdot * dpoint.x, pvdot * dpoint.y);
-
-        //Subtract this from pointv
-        FPoint2D ap(pv.x - ds.x, pv.y - ds.y);
-
-        return distance(pv,ds);
-    }
     void Polygon::algorithmSimplify(const std::vector<FPoint2D>& pointList, const FPoint2D::coord smallestLineLength, std::vector<FPoint2D>& out)
     {
             float dmax = 0.0;
@@ -155,7 +129,8 @@ namespace geom_utils
 
             for (int i = 1; i < pointList.size() - 1; i++)
             {
-                float d = perpendicularDistance(pointList[i], pointList[0], pointList[end]);
+                LineSegment2D line(pointList[0], pointList[end]);
+                float d = distanceFromPointToLine(pointList[i], line);
                 if (d > dmax)
                 {
                     index = i;
@@ -163,7 +138,6 @@ namespace geom_utils
                 }
 
             }
-
             if (dmax > smallestLineLength)
             {
                // Recursive call
@@ -186,7 +160,6 @@ namespace geom_utils
                 out.push_back(pointList[end]);
 
             }
-        
    }
 
     // Remove line segments which are smaller than the provided smallestLineLength value.

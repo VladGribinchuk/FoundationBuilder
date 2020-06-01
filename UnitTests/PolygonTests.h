@@ -177,6 +177,6 @@ DEFINE_TEST_CASE(PolygonSimplify)
     Polygon polyIn({ {0,0}, {1, 0.1}, {2, -0.1}, {3,5}, {4,6}, {5,7}, {6,8.1}, {7,9}, {8,9}, {9,9} });
     Polygon polyOut({ {0,0}, {2,-0.1}, {3,5}, {6,8.1}, {9,9} });
     polyIn.simplify(1.0);
-    TEST_ASSERT(polyIn == polyOut,"Faield In != Out");
+    TEST_ASSERT(polyIn == polyOut,"Failed In != Out");
 }
 
