@@ -121,7 +121,10 @@ namespace geom_utils
         std::for_each(points.begin(), points.end(), [&](FPoint2D& n) { n += p; });
     }
 
-    void Polygon::algorithmSimplify(const std::vector<FPoint2D>& pointList, const FPoint2D::coord smallestLineLength, std::vector<FPoint2D>& out)
+    // Builds a new curve with fever points
+    //The algorithm defines 'dissimilar' based on the maximum distance between the original curve and the simplified curve (i.e., the Hausdorff distance between the curves)
+    //Link - https://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm
+    void Polygon::simplifyRamerDouglasPeucker(const std::vector<FPoint2D>& pointList, const FPoint2D::coord epsilon, std::vector<FPoint2D>& out)
     {
             float dmax = 0.0;
             int index = 0;
@@ -138,15 +141,15 @@ namespace geom_utils
                 }
 
             }
-            if (dmax > smallestLineLength)
+            if (dmax > epsilon)
             {
                // Recursive call
                std:: vector<FPoint2D> recResults1;
                std:: vector<FPoint2D> recResults2;
                std:: vector<FPoint2D> firstLine(pointList.begin(), pointList.begin() + index + 1);
                std::vector<FPoint2D> lastLine(pointList.begin() + index, pointList.end());
-               algorithmSimplify(firstLine,smallestLineLength, recResults1);
-               algorithmSimplify(lastLine, smallestLineLength, recResults2);
+               simplifyRamerDouglasPeucker(firstLine, epsilon, recResults1);
+               simplifyRamerDouglasPeucker(lastLine, epsilon, recResults2);
                // Build the result list
                out.assign(recResults1.begin(), recResults1.end() - 1);
                out.insert(out.end(), recResults2.begin(), recResults2.end());
@@ -162,14 +165,13 @@ namespace geom_utils
             }
    }
 
-    // Remove line segments which are smaller than the provided smallestLineLength value.
-    // Result will recall smth like re-connecting points process.
-    void Polygon::simplify(const FPoint2D::coord smallestLineLength) 
+    //simplifies polygon based on Ramer–Douglas–Peucker algorithm
+    void Polygon::simplify(const FPoint2D::coord epsilon)
     {
         if (points.size() > 2) 
         {
             std::vector<FPoint2D> out;
-            algorithmSimplify(points, smallestLineLength, out);
+            simplifyRamerDouglasPeucker(points, epsilon, out);
             if (out.size() > 2)
             {
               points.swap(out);
