@@ -6,10 +6,10 @@ void Application::init(int argc, char** argv)
     CommandLine cl;
     cl.add(Option("InputModel", "specifies file path to input stl", "i", false, "input.stl"));
     cl.add(Option("OutputModel", "specifies file path to output stl", "o", false, "output.stl"));
-    cl.add(Option("MetaDate", "specifies file path to  metadate json", "m", false, "metadate.json"));
+    cl.add(Option("MetaData", "specifies file path to  metadate json", "m", false, "metadate.json"));
     cl.add(Option("Height", "this is the foundation height", "h", false));
     cl.add(Option("BuildIn", "write result in one or two files", "b", true));
-    cl.add(Option("ASCIIOrBinary", "write result in Binary or ASCII files", "a", true));
+    cl.add(Option("OutputInASCII", "write result in Binary or ASCII files", "a", true));
     cl.add(Option("Help", "help info", "help", true));
 
     if (!cl.parse(argc, argv) || cl.specified("help"))
