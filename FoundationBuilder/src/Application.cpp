@@ -6,13 +6,13 @@ void Application::init(int argc, char** argv)
     CommandLine cl;
     cl.add(Option("InputModel", "specifies file path to input stl", "i", false, "input.stl"));
     cl.add(Option("OutputModel", "specifies file path to output stl", "o", false, "output.stl"));
-    cl.add(Option("MetaDate", "specifies file path to output stl", "m", false, "metadate.json"));
-    cl.add(Option("Height", "this is the value option", "s", false));
-    cl.add(Option("BuildIn", "this is flag option", "b", true));
-    cl.add(Option("ASCIIOrBinary", "this is flag option", "f", true));
-    cl.add(Option("Help", "help info", "h", true));
+    cl.add(Option("MetaDate", "specifies file path to  metadate json", "m", false, "metadate.json"));
+    cl.add(Option("Height", "this is the foundation height", "h", false));
+    cl.add(Option("BuildIn", "write result in one or two files", "b", true));
+    cl.add(Option("ASCIIOrBinary", "write result in Binary or ASCII files", "a", true));
+    cl.add(Option("Help", "help info", "help", true));
 
-    if (!cl.parse(argc, argv) || cl.specified("h"))
+    if (!cl.parse(argc, argv) || cl.specified("help"))
     {
         cl.printHelpInfo();
         return;
@@ -23,7 +23,7 @@ void Application::init(int argc, char** argv)
     std::string metadate = cl.getValueAs<std::string>("MetaDate");
     float height = cl.getValueAs<float>("Height");
     bool buildIn = cl.specified("b");
-    bool fileType = cl.specified("f");
+    bool fileType = cl.specified("a");
 }
 
 // Main logic of the application is here
