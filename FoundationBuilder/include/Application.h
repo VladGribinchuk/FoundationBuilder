@@ -1,6 +1,11 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
+#include <vector>
+#include <sstream>
+#include <exception>
+#include <iostream>
 
 class ModelHandler
 {
@@ -10,15 +15,118 @@ public:
     void output() {}
 };
 
+struct Option
+{
+    Option(std::string name, std::string descr, std::string key, bool isFlag, std::string defaultValue = "")
+        : name(name), descripiton(descr), key(key), value(""), defaultValue(defaultValue), isFlag(isFlag)
+    {
+        if (isFlag)
+            this->defaultValue = (defaultValue.empty() ? "false" : "true"); //unificate value for flag
+    }
+
+    std::string name;
+    std::string descripiton;
+    std::string key;
+    std::string value;
+    std::string defaultValue;
+    bool isFlag;
+};
+
+inline std::ostream& operator<<(std::ostream& stream, const Option& option)
+{
+    stream << "- " << option.name << ": " << option.descripiton << '\n';
+    stream << "\tkey [-" << option.key << "]";
+    stream << (option.isFlag ? " is flag" : "");
+    stream << (!option.defaultValue.empty() ? ", default value = \"" + option.defaultValue + "\"" : "");
+    stream << '\n';
+    return stream;
+}
 class CommandLine
 {
+    std::vector<Option> options;
+    std::ostream& os;
+
 public:
-    void parse(int argc, char** argv) { }
+    CommandLine(std::ostream& ostream = std::cout) // standard console output by default
+        : os(ostream)
+    {}
+
+    // Defines available options
+    void add(Option opt) { options.push_back(opt); }
+
+    // Returns true if input arguments are valid.
+    bool parse(int argc, char** argv)
+    {
+        std::vector<std::string> args;
+        std::transform(argv + 1/*skip first argument, which is program name*/, argv + argc, std::back_inserter(args), [](char* arg) {
+            return std::string(arg);
+            });
+
+        for (int i = 0; i < args.size(); ++i)
+        {
+            auto arg = args[i];
+            if (arg.find('-') == 0)
+            {
+                std::string key = arg.substr(1);
+                auto it = std::find_if(options.begin(), options.end(), [key](const Option& opt) {return opt.key == key; });
+                if (it == options.end())
+                    continue; // unrecognized key, just skip
+                else
+                {
+                    if (it->isFlag)
+                        it->value = "true";
+                    else
+                    {
+                        if (++i < args.size())
+                            it->value = args[i];
+                        else
+                        {
+                            os << "Value was not specified for argument: " << arg << '\n';
+                            return false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                os << "Unspecified argument found: " << arg << '\n';
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     template<typename T>
-    T getValue(std::string key) { return T{}; }
+    T getValueAs(std::string nameOrKey) const
+    {
+        auto it = std::find_if(options.begin(), options.end(), [nameOrKey](const Option& opt) {return opt.key == nameOrKey || opt.name == nameOrKey; });
+        if (it == options.end())
+            throw std::logic_error(nameOrKey + " option was not specified!");
+        T val;
+        std::stringstream{ it->value.empty() ? it->defaultValue : it->value } >> std::boolalpha >> val;
+        return val;
+    }
+    // Returns true if option with provided name/key was specified by default or through the command line
+    bool specified(std::string nameOrKey) const
+    {
+        auto it = std::find_if(options.begin(), options.end(), [nameOrKey](const Option& opt) {return opt.key == nameOrKey || opt.name == nameOrKey; });
+        if (it != options.end())
+        {
+            if (it->isFlag)
+                return (it->value.empty() ? it->defaultValue == "true" : it->value == "true");
+            else
+                return !it->value.empty() || !it->defaultValue.empty();
+        }
+        return false;
+    }
 
-    bool isSpecified(std::string key) { return {}; }
+    void printHelpInfo() const
+    {
+        os << "Parameters usage:\n";
+        for (const auto& opt : options)
+            os << opt;
+    }
 };
 
 class Application
