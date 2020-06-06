@@ -179,4 +179,17 @@ DEFINE_TEST_CASE(PolygonSimplify)
     polyIn.simplify(1.0);
     TEST_ASSERT(polyIn == polyOut,"Failed In != Out");
 }
+DEFINE_TEST_CASE(PolygonInflate)
+{
+    //std::stringstream ss;
+    //Polygon p({ {-2.000, 5.000}, { 1.000, 3.000 }, { 1.000, 1.000 }, { 2.000, 2.000 }, { 3.000, -1.000 }, { -1.000, -2.000 }, { 3.000, 5.000 } });
+    //Polygon convex_p = p.convexHull();
+    //std::for_each(convex_p.begin(), convex_p.end(), [&](auto el) {ss << el; });
+    //TEST_CHECK((ss).str(), std::string("{-2.000; 5.000}{-1.000; -2.000}{3.000; -1.000}{3.000; 5.000}"), "The convex hull must be {-2.000; 5.000}{-1.000; -2.000}{3.000; -1.000}{3.000; 5.000}!");
+    //
 
+    Polygon polyIn({ {-4,-4}, {-1, 7}, {6, 1} });
+    Polygon polyOut = polyIn.inflate(5.0);
+    Polygon testPoly({ {-11.7662401,-13.4732885}, {-3.74492884, 15.9381838}, {14.9714642,-0.104437895} });
+    TEST_ASSERT(testPoly == polyOut, "Failed In != Out");
+}

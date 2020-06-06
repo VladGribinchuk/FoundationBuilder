@@ -252,4 +252,94 @@ namespace geom_utils
         return poly;
     }
 
+    inline FPoint2D vecRot90CW(const FPoint2D& point) 
+    {
+        FPoint2D newPoint(point.y,-point.x);
+        return newPoint;
+    }
+
+    inline FPoint2D vecRot90CCW(const FPoint2D& point) 
+    {
+        FPoint2D newPoint(-point.y,point.x);
+        return newPoint;
+    }
+
+    inline FPoint2D vecUnit(FPoint2D& point,const float value) 
+    {
+        
+        float len = std::sqrt(point.x * point.x + point.y * point.y);
+        point.x /= len;
+        point.y /= len;
+
+        FPoint2D d = (point * value);
+        return d;
+    }
+
+    //return true CWW  method will be called or return false CW  method will be called
+    bool Polygon::polyIsCw(const std::vector<FPoint2D>& points) const 
+    {
+        FPoint2D v1(points[1].x - points[0].x, points[1].y - points[0].y); // first edge, as a vector
+        FPoint2D v2(points[2].x - points[1].x, points[2].y - points[1].y); // second edge, as a vector
+        FPoint2D normal(v1.y, -v1.x);// CW normal of first edge
+        float pdot = dot(v2,normal);
+        if (pdot >= 0) return true;// CWW  method will be called
+        else return false;// CW  method will be called
+    }
+     
+    //return inflate poligon
+    Polygon Polygon::inflate(const float value) const 
+    {
+        Polygon poly;
+        bool polyIs = polyIsCw(points);
+
+        for (int i = 0; i < points.size(); i++) 
+        {
+        
+            // get this point (pt1), the point before it (pt0) and the point that follows it (pt2)
+            FPoint2D point0 = points[(i > 0) ? i - 1 : points.size() - 1];
+            FPoint2D point1 = points[i];
+            FPoint2D point2 = points[(i + 1) % points.size()];
+
+            
+            // find the line vectors of the lines goingn to the current point
+            FPoint2D v1(point1 - point0);
+            FPoint2D v2(point2 - point1);
+
+            FPoint2D rotPoint1;
+            FPoint2D rotPoint2;
+            //select functions
+            if (polyIs)
+            {
+                rotPoint1 = vecRot90CCW(v1);
+                rotPoint2 = vecRot90CCW(v2);
+
+            }
+            else
+            {
+                rotPoint1 = vecRot90CW(v1);
+                rotPoint2 = vecRot90CW(v2);
+            }
+
+            // find the normals of the two lines, multiplied to the distance that polygon should inflate
+            FPoint2D d0 = vecUnit(rotPoint1, value);
+            FPoint2D d1 = vecUnit(rotPoint2, value);
+
+   
+            // use the normals to find two points on the lines parallel to the polygon lines
+            FPoint2D dPoint0(point0 + d0);
+            FPoint2D dPoint1(point1 + d0);
+            FPoint2D dPoint2(point1 + d1);
+            FPoint2D dPoint3(point2 + d1);
+
+            LineSegment2D line1(dPoint0,dPoint1);
+            LineSegment2D line2(dPoint2,dPoint3);
+
+            FPoint2D newPoint;
+            newPoint = lineSegmentsIntersection(line1,line2);
+           
+            poly.points.push_back(newPoint);
+        }
+      
+        return poly;
+    }
 }

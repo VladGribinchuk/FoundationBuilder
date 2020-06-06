@@ -91,12 +91,19 @@ namespace geom_utils
         std::vector<Triangle2D> triangulate() const;
 
         static Polygon makePolygon(const Triangle2D& tri);
+
+        //return inflate poligon
+        Polygon inflate(const float value) const;
        
     private:
         // Builds a new curve with fever points
         //The algorithm defines 'dissimilar' based on the maximum distance between the original curve and the simplified curve (i.e., the Hausdorff distance between the curves)
         //Link - https://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm
         void simplifyRamerDouglasPeucker(const std::vector<FPoint2D>& pointList, const FPoint2D::coord epsilon, std::vector<FPoint2D>& out);
+
+        //return true CWW  method will be called or return false CW  method will be called
+        bool polyIsCw(const std::vector<FPoint2D>& points) const;
+       
     };
 
     bool operator==(const Polygon& lhs, const Polygon& rhs);
