@@ -275,22 +275,11 @@ namespace geom_utils
         return d;
     }
 
-    //return true CWW  method will be called or return false CW  method will be called
-    bool Polygon::polyIsCw(const std::vector<FPoint2D>& points) const 
-    {
-        FPoint2D v1(points[1].x - points[0].x, points[1].y - points[0].y); // first edge, as a vector
-        FPoint2D v2(points[2].x - points[1].x, points[2].y - points[1].y); // second edge, as a vector
-        FPoint2D normal(v1.y, -v1.x);// CW normal of first edge
-        float pdot = dot(v2,normal);
-        if (pdot >= 0) return true;// CWW  method will be called
-        else return false;// CW  method will be called
-    }
-     
     //return inflate poligon
     Polygon Polygon::inflate(const float value) const 
     {
         Polygon poly;
-        bool polyIs = polyIsCw(points);
+        bool polyIs = orientation();
 
         for (int i = 0; i < points.size(); i++) 
         {
@@ -308,7 +297,7 @@ namespace geom_utils
             FPoint2D rotPoint1;
             FPoint2D rotPoint2;
             //select functions
-            if (polyIs)
+            if (!polyIs)
             {
                 rotPoint1 = vecRot90CCW(v1);
                 rotPoint2 = vecRot90CCW(v2);

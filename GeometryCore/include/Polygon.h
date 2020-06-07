@@ -101,9 +101,6 @@ namespace geom_utils
         //Link - https://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm
         void simplifyRamerDouglasPeucker(const std::vector<FPoint2D>& pointList, const FPoint2D::coord epsilon, std::vector<FPoint2D>& out);
 
-        //return true CWW  method will be called or return false CW  method will be called
-        bool polyIsCw(const std::vector<FPoint2D>& points) const;
-       
     };
 
     bool operator==(const Polygon& lhs, const Polygon& rhs);
