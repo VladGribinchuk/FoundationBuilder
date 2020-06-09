@@ -252,29 +252,6 @@ namespace geom_utils
         return poly;
     }
 
-    inline FPoint2D vecRot90CW(const FPoint2D& point) 
-    {
-        FPoint2D newPoint(point.y,-point.x);
-        return newPoint;
-    }
-
-    inline FPoint2D vecRot90CCW(const FPoint2D& point) 
-    {
-        FPoint2D newPoint(-point.y,point.x);
-        return newPoint;
-    }
-
-    inline FPoint2D vecUnit(FPoint2D& point,const float value) 
-    {
-        
-        float len = std::sqrt(point.x * point.x + point.y * point.y);
-        point.x /= len;
-        point.y /= len;
-
-        FPoint2D d = (point * value);
-        return d;
-    }
-
     //return inflate poligon
     Polygon Polygon::inflate(const float value) const 
     {
@@ -310,8 +287,11 @@ namespace geom_utils
             }
 
             // find the normals of the two lines, multiplied to the distance that polygon should inflate
-            FPoint2D d0 = vecUnit(rotPoint1, value);
-            FPoint2D d1 = vecUnit(rotPoint2, value);
+            FPoint2D d0 = normalizeVector(rotPoint1);
+            FPoint2D d1 = normalizeVector(rotPoint2);
+
+            d0 = d1* value;
+            d1 = d1 * value;
 
    
             // use the normals to find two points on the lines parallel to the polygon lines
@@ -325,7 +305,6 @@ namespace geom_utils
 
             FPoint2D newPoint;
             newPoint = lineSegmentsIntersection(line1,line2);
-           
             poly.points.push_back(newPoint);
         }
       

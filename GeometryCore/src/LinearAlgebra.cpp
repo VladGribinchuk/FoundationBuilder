@@ -113,4 +113,26 @@ namespace geom_utils
         }
         return std::any_of(polygon_side_closer_to_second_polygon_than_gap.begin(), polygon_side_closer_to_second_polygon_than_gap.end(), [](bool k) {return k; });
     }
+
+   
+    FPoint2D vecRot90CW(const FPoint2D& point)
+    {
+        FPoint2D newPoint(point.y, -point.x);
+        return newPoint;
+    }
+
+   
+    FPoint2D vecRot90CCW(const FPoint2D& point)
+    {
+        FPoint2D newPoint(-point.y, point.x);
+        return newPoint;
+    }
+
+    FPoint2D normalizeVector(FPoint2D& vec) 
+    {
+        float len = std::sqrt(vec.x * vec.x + vec.y * vec.y);
+        vec.x /= len;
+        vec.y /= len;
+        return vec;
+    }
 }
