@@ -4,6 +4,7 @@
 #include "../include/LineSegment.h"
 
 
+
 namespace geom_utils
 {
     bool operator==(const Polygon& lhs, const Polygon& rhs) 
@@ -270,42 +271,44 @@ namespace geom_utils
             // find the line vectors of the lines goingn to the current point
             FPoint2D v1(point1 - point0);
             FPoint2D v2(point2 - point1);
+            if (cross(v1, v2) != 0) {
 
-            FPoint2D rotPoint1;
-            FPoint2D rotPoint2;
-            //select functions
-            if (!polyIs)
-            {
-                rotPoint1 = vecRot90CCW(v1);
-                rotPoint2 = vecRot90CCW(v2);
+                FPoint2D rotPoint1;
+                FPoint2D rotPoint2;
+                //select functions
+                if (!polyIs)
+                {
+                    rotPoint1 = vecRot90CCW(v1);
+                    rotPoint2 = vecRot90CCW(v2);
 
+                }
+                else
+                {
+                    rotPoint1 = vecRot90CW(v1);
+                    rotPoint2 = vecRot90CW(v2);
+                }
+
+                // find the normals of the two lines, multiplied to the distance that polygon should inflate
+                FPoint2D d0 = normalizeVector(rotPoint1);
+                FPoint2D d1 = normalizeVector(rotPoint2);
+
+                d0 = d0 * value;
+                d1 = d1 * value;
+
+
+                // use the normals to find two points on the lines parallel to the polygon lines
+                FPoint2D dPoint0(point0 + d0);
+                FPoint2D dPoint1(point1 + d0);
+                FPoint2D dPoint2(point1 + d1);
+                FPoint2D dPoint3(point2 + d1);
+
+                LineSegment2D line1(dPoint0, dPoint1);
+                LineSegment2D line2(dPoint2, dPoint3);
+
+                FPoint2D newPoint;
+                newPoint = lineSegmentsIntersection(line1, line2);
+                poly.points.push_back(newPoint);
             }
-            else
-            {
-                rotPoint1 = vecRot90CW(v1);
-                rotPoint2 = vecRot90CW(v2);
-            }
-
-            // find the normals of the two lines, multiplied to the distance that polygon should inflate
-            FPoint2D d0 = normalizeVector(rotPoint1);
-            FPoint2D d1 = normalizeVector(rotPoint2);
-
-            d0 = d1* value;
-            d1 = d1 * value;
-
-   
-            // use the normals to find two points on the lines parallel to the polygon lines
-            FPoint2D dPoint0(point0 + d0);
-            FPoint2D dPoint1(point1 + d0);
-            FPoint2D dPoint2(point1 + d1);
-            FPoint2D dPoint3(point2 + d1);
-
-            LineSegment2D line1(dPoint0,dPoint1);
-            LineSegment2D line2(dPoint2,dPoint3);
-
-            FPoint2D newPoint;
-            newPoint = lineSegmentsIntersection(line1,line2);
-            poly.points.push_back(newPoint);
         }
       
         return poly;
