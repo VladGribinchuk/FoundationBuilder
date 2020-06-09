@@ -92,7 +92,6 @@ namespace geom_utils
 
         static Polygon makePolygon(const Triangle2D& tri);
 
-        //return inflate poligon
         Polygon inflate(const float value) const;
        
     private:

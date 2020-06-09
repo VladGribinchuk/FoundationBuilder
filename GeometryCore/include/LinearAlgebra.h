@@ -80,6 +80,6 @@ namespace geom_utils
 
     FPoint2D vecRot90CCW(const FPoint2D& point);
 
-    FPoint2D normalizeVector(FPoint2D& vec);
+    FPoint2D normalizeVector(const FPoint2D& vec);
 
 } // namespace geom_utils

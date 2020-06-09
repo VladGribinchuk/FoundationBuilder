@@ -128,11 +128,12 @@ namespace geom_utils
         return newPoint;
     }
 
-    FPoint2D normalizeVector(FPoint2D& vec) 
+    FPoint2D normalizeVector(const FPoint2D& vec)
     {
-        float len = std::sqrt(vec.x * vec.x + vec.y * vec.y);
-        vec.x /= len;
-        vec.y /= len;
-        return vec;
+        FPoint2D newPoint(vec);
+        float len = std::sqrt(newPoint.x * newPoint.x + newPoint.y * newPoint.y);
+        newPoint.x /= len;
+        newPoint.y /= len;
+        return newPoint;
     }
 }

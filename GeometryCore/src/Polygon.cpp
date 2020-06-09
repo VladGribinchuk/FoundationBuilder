@@ -253,7 +253,6 @@ namespace geom_utils
         return poly;
     }
 
-    //return inflate poligon
     Polygon Polygon::inflate(const float value) const 
     {
         Polygon poly;
@@ -271,7 +270,10 @@ namespace geom_utils
             // find the line vectors of the lines goingn to the current point
             FPoint2D v1(point1 - point0);
             FPoint2D v2(point2 - point1);
-            if (cross(v1, v2) != 0) {
+            
+
+            if (std::fabs(cross(v1,v2)) < getUnitTolerance())
+            {
 
                 FPoint2D rotPoint1;
                 FPoint2D rotPoint2;
