@@ -253,66 +253,65 @@ namespace geom_utils
         return poly;
     }
 
-    Polygon Polygon::inflate(const float value) const 
+    Polygon Polygon::inflate(const float value, const float cornerAllowanceMultiplier) const
     {
+        // hold 2x more points than original
+        // to enable concurrent access from parallel loop
         Polygon poly;
-        bool polyIs = orientation();
+        poly.points.resize(this->size() * 2, notAPoint<FPoint2D>());
 
+        bool isCCW = orientation();
+
+        #pragma omp parallel for
         for (int i = 0; i < points.size(); i++) 
         {
-        
             // get this point (pt1), the point before it (pt0) and the point that follows it (pt2)
             FPoint2D point0 = points[(i > 0) ? i - 1 : points.size() - 1];
             FPoint2D point1 = points[i];
             FPoint2D point2 = points[(i + 1) % points.size()];
 
-            
-            // find the line vectors of the lines goingn to the current point
+            // find the line vectors of the lines going to the current point
             FPoint2D v1(point1 - point0);
             FPoint2D v2(point2 - point1);
-            
 
-            if (std::fabs(cross(v1,v2)) < getUnitTolerance())
-            {
+            FPoint2D rotPoint1 = (!isCCW ? vecRot90CCW(v1) : vecRot90CW(v1));
+            FPoint2D rotPoint2 = (!isCCW ? vecRot90CCW(v2) : vecRot90CW(v2));
 
-                FPoint2D rotPoint1;
-                FPoint2D rotPoint2;
-                //select functions
-                if (!polyIs)
+            // find the normals of the two lines, multiplied to the distance that polygon should inflate
+            FPoint2D offsetVec1 = normalizeVector(rotPoint1) * value;
+            FPoint2D offsetVec2 = normalizeVector(rotPoint2) * value;
+
+            if (std::fabs(cross(v1, v2)) < getUnitTolerance())
+            { // original lines are collinear
+                auto dist = distance(point1 + offsetVec1, point1 + offsetVec2);
+                if (dist > getUnitTolerance())
+                {  // sides are not close to each other, so most likely they are shaping 0 degree angle
+                    poly.points[i * 2] = point1 + offsetVec1;
+                    poly.points[i * 2 + 1] = point1 + offsetVec2;
+                }
+            }
+            else
+            { // lines are not collinear, so can find intersection safely
+                LineSegment2D inflatedSide1(point0 + offsetVec1, point1 + offsetVec1);
+                LineSegment2D inflatedSide2(point1 + offsetVec2, point2 + offsetVec2);
+                auto intersection = lineSegmentsIntersection(inflatedSide1, inflatedSide2);
+
+                auto distanceFromOriginalCornerToInflated = distance(point1, intersection);
+                if (distanceFromOriginalCornerToInflated <= value * cornerAllowanceMultiplier)
                 {
-                    rotPoint1 = vecRot90CCW(v1);
-                    rotPoint2 = vecRot90CCW(v2);
-
+                    poly.points[i * 2] = intersection;
                 }
                 else
-                {
-                    rotPoint1 = vecRot90CW(v1);
-                    rotPoint2 = vecRot90CW(v2);
+                { // angle is too sharp for the provided threshold, so clip it
+                    auto corningVector = normalizeVector(intersection - point1) * (value * cornerAllowanceMultiplier);
+                    poly.points[i * 2] = pointProjectionToLineSegment(point1 + corningVector, inflatedSide1);
+                    poly.points[i * 2 + 1] = pointProjectionToLineSegment(point1 + corningVector, inflatedSide2);
                 }
-
-                // find the normals of the two lines, multiplied to the distance that polygon should inflate
-                FPoint2D d0 = normalizeVector(rotPoint1);
-                FPoint2D d1 = normalizeVector(rotPoint2);
-
-                d0 = d0 * value;
-                d1 = d1 * value;
-
-
-                // use the normals to find two points on the lines parallel to the polygon lines
-                FPoint2D dPoint0(point0 + d0);
-                FPoint2D dPoint1(point1 + d0);
-                FPoint2D dPoint2(point1 + d1);
-                FPoint2D dPoint3(point2 + d1);
-
-                LineSegment2D line1(dPoint0, dPoint1);
-                LineSegment2D line2(dPoint2, dPoint3);
-
-                FPoint2D newPoint;
-                newPoint = lineSegmentsIntersection(line1, line2);
-                poly.points.push_back(newPoint);
             }
         }
-      
+
+        poly.points.erase(std::remove(poly.points.begin(), poly.points.end(), notAPoint<FPoint2D>()), poly.points.end());
+
         return poly;
     }
 }
