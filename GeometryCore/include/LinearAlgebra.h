@@ -76,4 +76,10 @@ namespace geom_utils
     // Note: test vertices of one polygon to see if they are closer than the gap to any lines in other poly.
     bool polygonsAreAdjacent(const Polygon& poly, const Polygon& poly2, const FPoint2D::coord gap);
 
+    FPoint2D vecRot90CW(const FPoint2D& point);
+
+    FPoint2D vecRot90CCW(const FPoint2D& point);
+
+    FPoint2D normalizeVector(const FPoint2D& vec);
+
 } // namespace geom_utils

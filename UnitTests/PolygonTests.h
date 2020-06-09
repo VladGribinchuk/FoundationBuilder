@@ -179,4 +179,18 @@ DEFINE_TEST_CASE(PolygonSimplify)
     polyIn.simplify(1.0);
     TEST_ASSERT(polyIn == polyOut,"Failed In != Out");
 }
+DEFINE_TEST_CASE(PolygonInflateCW)
+{
+    Polygon polyIn({ {-4,-4}, {-1, 7}, {6, 1} });
+    Polygon polyOut = polyIn.inflate(5.0);
+    Polygon testPoly({ {-11.7662401,-13.4732885}, {-3.74492884, 15.9381838}, {14.9714642,-0.104437895} });
+    TEST_ASSERT(testPoly == polyOut, "Failed In != Out");
+}
 
+DEFINE_TEST_CASE(PolygonInflateCWW)
+{
+    Polygon polyIn({ {6, 1}, {-1, 7}, {-4,-4} });
+    Polygon polyOut = polyIn.inflate(5.0);
+    Polygon testPoly({ {14.9714642,-0.104437895}, {-3.74492884, 15.9381838}, {-11.7662401,-13.4732885}  });
+    TEST_ASSERT(testPoly == polyOut, "Failed In != Out");
+}
