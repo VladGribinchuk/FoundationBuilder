@@ -123,3 +123,27 @@ DEFINE_TEST_CASE(MeshWriteBinary)
         mesh[0].c.x == 0 && mesh[0].c.y == 1 && mesh[0].c.z == -1
         ), "The written mesh is wrong!");
 }
+
+DEFINE_TEST_CASE(FoundationCreationFacetsModel)
+{
+    Mesh mesh;
+    mesh.read("../test_models/facets_155314.stl");
+    Mesh output_mesh = createFoundation(mesh);
+    output_mesh.writeBinary("../test_models/facets_foundation.stl");
+}
+
+DEFINE_TEST_CASE(FoundationCreationConcativeOutline)
+{
+    Mesh mesh;
+    mesh.read("../test_models/concave_outline_binary.stl");
+    Mesh output_mesh = createFoundation(mesh);
+    output_mesh.writeBinary("../test_models/concative_foundation.stl");
+}
+
+DEFINE_TEST_CASE(FoundationCreationCube)
+{
+    Mesh mesh;
+    mesh.read("../test_models/cube_20x20x20_ascii.stl");
+    Mesh output_mesh = createFoundation(mesh);
+    output_mesh.writeBinary("../test_models/cube_foundation.stl");
+}

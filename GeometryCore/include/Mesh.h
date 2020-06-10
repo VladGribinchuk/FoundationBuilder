@@ -31,6 +31,7 @@ namespace geom_utils
         bool writeBinary(const std::string& filepath) const;
     };
 
+    Mesh createFoundation(const Mesh& inputModel);
 
     class MeshHandler
     {
