@@ -92,7 +92,16 @@ namespace geom_utils
 
         static Polygon makePolygon(const Triangle2D& tri);
 
-        Polygon inflate(const float value) const;
+        /*
+         * Method for offsetting polygon contour outward making it to be expanded by provided value.
+         * NOTE: works correctly only for convex polygon. May return improper results for non-convex.
+         * 
+         * Acute angles may create long narrow spikes, which can be clipped by cornerAllowanceMultiplier.
+         *  - by default it is equal to 1.1, which means 110% of inflating value threshold for expanded corners, that allows obtuse angles, but clips acute;
+         *  - minimal value is 0, which means 0% of inflating value; 
+         *  - lower multiplier means more aggressive clipping, larger multiplier means relaxing clipping policy.
+         */
+        Polygon inflate(const float value, const float cornerAllowanceMultiplier = 1.1) const;
        
     private:
         // Builds a new curve with fever points
