@@ -128,7 +128,7 @@ DEFINE_TEST_CASE(FoundationCreationFacetsModel)
 {
     Mesh mesh;
     mesh.read("../test_models/facets_155314.stl");
-    Mesh output_mesh = createFoundation(mesh);
+    Mesh output_mesh = createFoundation(mesh, 6.00);
     output_mesh.writeBinary("../test_models/facets_foundation.stl");
 }
 
@@ -136,7 +136,7 @@ DEFINE_TEST_CASE(FoundationCreationConcativeOutline)
 {
     Mesh mesh;
     mesh.read("../test_models/concave_outline_binary.stl");
-    Mesh output_mesh = createFoundation(mesh);
+    Mesh output_mesh = createFoundation(mesh, 7.00);
     output_mesh.writeBinary("../test_models/concative_foundation.stl");
 }
 
@@ -144,6 +144,6 @@ DEFINE_TEST_CASE(FoundationCreationCube)
 {
     Mesh mesh;
     mesh.read("../test_models/cube_20x20x20_ascii.stl");
-    Mesh output_mesh = createFoundation(mesh);
+    Mesh output_mesh = createFoundation(mesh, 8.00);
     output_mesh.writeBinary("../test_models/cube_foundation.stl");
 }

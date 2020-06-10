@@ -165,27 +165,22 @@ namespace geom_utils
 		return true;
 	}
 
-	Mesh createFoundation(const Mesh& inputModel) {
+	Mesh createFoundation(const Mesh& inputModel, const FPoint3D::coord foundation_height) {
 		auto from_2d_to_3d_triangle = [](const Triangle2D& input_triangle) { return Triangle3D(FPoint3D(input_triangle.a.x, input_triangle.a.y, 0), FPoint3D(input_triangle.b.x, input_triangle.b.y, 0), FPoint3D(input_triangle.c.x, input_triangle.c.y, 0)); };
 		auto move_up = [](std::vector<Triangle3D>& foundation_part, FPoint3D::coord by) {for_each(foundation_part.begin(), foundation_part.end(), [&](Triangle3D& input) {input.a.z += by; input.b.z += by; input.c.z += by; }); };
 
 		std::vector<Triangle3D> facets(inputModel.getFacets());
 		Polygon verticles;
-		std::vector<FPoint3D::coord> heights_of_verticles;
+
 		for (auto i : facets) {
 			verticles.add(FPoint2D(i.a.x, i.a.y));
 			verticles.add(FPoint2D(i.b.x, i.b.y));
 			verticles.add(FPoint2D(i.c.x, i.c.y));
-			heights_of_verticles.push_back(i.a.z);
-			heights_of_verticles.push_back(i.b.z);
-			heights_of_verticles.push_back(i.c.z);
 		}
 		auto convex = verticles.convexHull();
 		convex.simplify(convex.polygonLength() * 0.01);
 		auto plane_for_foundation = convex.inflate(5.00);
 
-
-		FPoint3D::coord foundation_height = (*std::max_element(heights_of_verticles.begin(), heights_of_verticles.end()) - *std::min_element(heights_of_verticles.begin(), heights_of_verticles.end())) * 0.3;
 		auto polygon_of_bottom = plane_for_foundation.triangulate();
 
 		std::vector<Triangle3D> foundation_bottom;
