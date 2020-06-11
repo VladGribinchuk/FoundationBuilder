@@ -125,7 +125,7 @@ DEFINE_TEST_CASE(MeshWriteBinary)
         ), "The written mesh is wrong!");
 }
 
-DEFINE_TEST_CASE(FoundationCreationFacetsModel)
+DEFINE_TEST_CASE(FoundationNormals)
 {
     Mesh mesh;
     mesh.read("../test_models/facets_155314.stl");
@@ -135,10 +135,9 @@ DEFINE_TEST_CASE(FoundationCreationFacetsModel)
     TEST_ASSERT(facets[i].getNormal() == FPoint3D(0, 0, 1), "Normal of facets on top must be {0, 0, 1}");
     int j = facets.size() - 1;
     TEST_ASSERT(facets[j].getNormal() == FPoint3D(0, 0, -1), "Normal of facets on bottom must be {0, 0, -1}");
-    output_mesh.writeBinary("../test_models/facets_foundation.stl");
 }
 
-DEFINE_TEST_CASE(FoundationCreationConcativeOutline)
+DEFINE_TEST_CASE(FoundationHeight)
 {
     Mesh mesh;
     mesh.read("../test_models/concave_outline_binary.stl");
@@ -146,10 +145,9 @@ DEFINE_TEST_CASE(FoundationCreationConcativeOutline)
     auto facets = output_mesh.getFacets();
     int i = 0, j = facets.size() - 1;
     TEST_ASSERT(facets[i].a.z - facets[j].a.z == 7.00, "Height of foundation must be 7.00");
-    output_mesh.writeBinary("../test_models/concative_foundation.stl");
 }
 
-DEFINE_TEST_CASE(FoundationCreationCube)
+DEFINE_TEST_CASE(FoundationInBox)
 {
     Mesh mesh;
     mesh.read("../test_models/cube_20x20x20_ascii.stl");
@@ -160,5 +158,4 @@ DEFINE_TEST_CASE(FoundationCreationCube)
     for (auto i : output_mesh.getFacets()) {
         TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
     }
-    output_mesh.writeBinary("../test_models/cube_foundation.stl");
 }
