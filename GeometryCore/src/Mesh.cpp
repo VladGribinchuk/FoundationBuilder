@@ -165,9 +165,9 @@ namespace geom_utils
 		return true;
 	}
 
-	Mesh createFoundation(const Mesh& inputModel, const FPoint3D::coord foundation_height) {
-		auto from_2d_to_3d_triangle = [](const Triangle2D& input_triangle) { return Triangle3D(FPoint3D(input_triangle.a.x, input_triangle.a.y, 0), FPoint3D(input_triangle.b.x, input_triangle.b.y, 0), FPoint3D(input_triangle.c.x, input_triangle.c.y, 0)); };
-		auto move_up = [](std::vector<Triangle3D>& foundation_part, FPoint3D::coord by) {for_each(foundation_part.begin(), foundation_part.end(), [&](Triangle3D& input) {input.a.z += by; input.b.z += by; input.c.z += by; }); };
+	Mesh createFoundation(const Mesh& inputModel, const FPoint3D::coord foundationHeight, const FPoint3D::coord inflateValue) {
+		auto from2dTo3dTriangle = [](const Triangle2D& input_triangle) { return Triangle3D(FPoint3D(input_triangle.a.x, input_triangle.a.y, 0), FPoint3D(input_triangle.b.x, input_triangle.b.y, 0), FPoint3D(input_triangle.c.x, input_triangle.c.y, 0)); };
+		auto moveUp = [](std::vector<Triangle3D>& foundation_part, FPoint3D::coord by) {for_each(foundation_part.begin(), foundation_part.end(), [&](Triangle3D& input) {input.a.z += by; input.b.z += by; input.c.z += by; }); };
 
 		std::vector<Triangle3D> facets(inputModel.getFacets());
 		Polygon verticles;
@@ -179,27 +179,28 @@ namespace geom_utils
 		}
 		auto convex = verticles.convexHull();
 		convex.simplify(convex.polygonLength() * 0.01);
-		auto plane_for_foundation = convex.inflate(5.00);
+		auto plane_for_foundation = convex.inflate(inflateValue);
 
 		auto polygon_of_bottom = plane_for_foundation.triangulate();
 
 		std::vector<Triangle3D> foundation_bottom;
-		std::for_each(polygon_of_bottom.begin(), polygon_of_bottom.end(), [&](const Triangle2D& input_triangle) {foundation_bottom.push_back(from_2d_to_3d_triangle(input_triangle)); });
+		std::for_each(polygon_of_bottom.begin(), polygon_of_bottom.end(), [&](const Triangle2D& input_triangle) {foundation_bottom.push_back(from2dTo3dTriangle(input_triangle)); });
 		auto foundation_top(foundation_bottom);
-		move_up(foundation_top, foundation_height);
+		moveUp(foundation_top, foundationHeight);
 
 		Mesh foundation;
+		for_each(foundation_bottom.begin(), foundation_bottom.end(), [](Triangle3D& i) {i.reverse(); });
 		for (int i = 0; i < foundation_bottom.size(); ++i) {
 			foundation.add(foundation_top[i]);
 
 			if (i == 0) {
-				foundation.add(Triangle3D(foundation_top[i].b, foundation_bottom[i].b, foundation_bottom[i].c));
-				foundation.add(Triangle3D(foundation_top[i].b, foundation_bottom[i].c, foundation_top[i].c));
+				foundation.add(Triangle3D(foundation_top[i].b, foundation_bottom[i].b, foundation_bottom[i].a));
+				foundation.add(Triangle3D(foundation_top[i].b, foundation_bottom[i].a, foundation_top[i].c));
 			}
-			foundation.add(Triangle3D(foundation_top[i].c, foundation_bottom[i].c, foundation_bottom[i].a));
-			foundation.add(Triangle3D(foundation_top[i].c, foundation_bottom[i].a, foundation_top[i].a));
+			foundation.add(Triangle3D(foundation_top[i].c, foundation_bottom[i].a, foundation_bottom[i].c));
+			foundation.add(Triangle3D(foundation_top[i].c, foundation_bottom[i].c, foundation_top[i].a));
 			if (i == foundation_bottom.size() - 1) {
-				foundation.add(Triangle3D(foundation_top[i].a, foundation_bottom[i].a, foundation_bottom[i].b));
+				foundation.add(Triangle3D(foundation_top[i].a, foundation_bottom[i].c, foundation_bottom[i].b));
 				foundation.add(Triangle3D(foundation_top[i].a, foundation_bottom[i].b, foundation_top[i].b));
 			}
 
