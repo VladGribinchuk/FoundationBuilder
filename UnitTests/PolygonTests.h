@@ -183,7 +183,7 @@ DEFINE_TEST_CASE(PolygonInflateCW)
 {
     Polygon polyIn({ {-4,-4}, {-1, 7}, {6, 1} });
     Polygon polyOut = polyIn.inflate(5.0);
-    Polygon testPoly({ {-11.7662401,-13.4732885}, {-3.74492884, 15.9381838}, {14.9714642,-0.104437895} });
+    Polygon testPoly({ {-6.25483656,-10.7175875}, {-10.1449280,-7.52847576}, {-4.60096598,12.7993841 },{-1.27473366,13.8208742},{12.7328405,1.81438231 },{12.3342981,-1.42302060 } });
     TEST_ASSERT(testPoly == polyOut, "Failed In != Out");
 }
 
@@ -191,6 +191,6 @@ DEFINE_TEST_CASE(PolygonInflateCWW)
 {
     Polygon polyIn({ {6, 1}, {-1, 7}, {-4,-4} });
     Polygon polyOut = polyIn.inflate(5.0);
-    Polygon testPoly({ {14.9714642,-0.104437895}, {-3.74492884, 15.9381838}, {-11.7662401,-13.4732885}  });
+    Polygon testPoly({ {12.3342981,-1.42302060 },{12.7328396,1.81438160 },{-1.27473366 ,13.8208742 },{-4.60096645,12.7993841 },{-10.1449270,-7.52847576 },{-6.25483656,-10.7175875 } });
     TEST_ASSERT(testPoly == polyOut, "Failed In != Out");
 }
