@@ -11,7 +11,7 @@ namespace geom_utils
     {
         std::vector<Triangle3D> facets;
         std::string modelName;
-        
+
     public:
         Mesh() = default; //empty mesh
         bool isEmpty() const { return facets.empty(); }
@@ -41,7 +41,7 @@ namespace geom_utils
         static bool readBinary(const std::string& filepath, Mesh& mesh);
         static bool readASCII(const std::string& filepath, Mesh& mesh);
     public:
-        static bool read(const std::string& filepath, Mesh &mesh);      
+        static bool read(const std::string& filepath, Mesh& mesh);
         static bool writeASCII(const std::string& filepath, const Mesh& mesh);
         static bool writeBinary(const std::string& filepath, const Mesh& mesh);
     };
