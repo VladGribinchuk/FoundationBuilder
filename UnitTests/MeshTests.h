@@ -159,3 +159,16 @@ DEFINE_TEST_CASE(FoundationInBox)
         TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
     }
 }
+
+DEFINE_TEST_CASE(PlacingFoundationUnderFigure)
+{
+    Mesh model;
+    model.read("../test_models/cube_20x20x20_ascii.stl");
+    Mesh fonundation = createFoundation(model, 4.00, 5.00);
+    Mesh out = integrateFoundationIntoModel(model,fonundation);
+
+    AABB3D box(FPoint3D(-15.001, -15.001, -5.001), FPoint3D(20.001, 20.001, 20.001));
+    for (auto i : out.getFacets()) {
+        TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
+    }
+}

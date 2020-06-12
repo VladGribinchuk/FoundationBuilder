@@ -32,6 +32,13 @@ namespace geom_utils
     };
 
     Mesh createFoundation(const Mesh& inputModel, const FPoint3D::coord foundationHeight, const FPoint3D::coord inflateValue);
+    /*
+     * NOTE:Method works correctly only if there are two types z(z0,z1)
+     *
+     * The foundation is placed under the figure with a gap
+     *  - by default gap is equal to 0.5
+     */
+    Mesh integrateFoundationIntoModel(const Mesh& model, const Mesh& foundation);
 
     class MeshHandler
     {

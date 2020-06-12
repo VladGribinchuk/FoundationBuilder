@@ -208,4 +208,57 @@ namespace geom_utils
 		}
 		return foundation;
 	}
+	Mesh integrateFoundationIntoModel(const Mesh& model, const Mesh& foundation)
+	{
+		if (!model.isEmpty())
+		{
+			const float gap = 0.5;
+			Mesh resultFigure;
+			std::vector<Triangle3D> facetsModel = model.getFacets();
+			std::vector<Triangle3D> facetsFoundation = foundation.getFacets();
+			std::vector<FPoint3D::coord> getZModel;
+			std::vector<FPoint3D::coord> getZFoundation;
+			for (auto i : facetsModel) 
+			{
+				getZModel.push_back(i.a.z);
+				getZModel.push_back(i.b.z);
+				getZModel.push_back(i.c.z);
+			}
+			for (auto i : facetsFoundation) 
+			{
+				getZFoundation.push_back(i.a.z);
+				getZFoundation.push_back(i.b.z);
+				getZFoundation.push_back(i.c.z);
+			}
+
+			FPoint3D::coord zMinModel = *std::min_element(getZModel.begin(),getZModel.end());
+			FPoint3D::coord zMinFoundation = *std::min_element(getZFoundation.begin(),getZFoundation.end());
+			FPoint3D::coord zMaxFoundation = *std::max_element(getZFoundation.begin(),getZFoundation.end());
+			const float height = zMaxFoundation - zMinFoundation;
+
+			for (int i = 0; i < facetsFoundation.size(); i++) 
+			{
+				if (zMaxFoundation == facetsFoundation[i].a.z) facetsFoundation[i].a.z = zMinModel - gap;
+				if (zMinFoundation == facetsFoundation[i].a.z) facetsFoundation[i].a.z = zMinModel - gap - height;
+
+				if (zMaxFoundation == facetsFoundation[i].b.z) facetsFoundation[i].b.z = zMinModel - gap;
+				if (zMinFoundation == facetsFoundation[i].b.z) facetsFoundation[i].b.z = zMinModel - gap - height;
+
+				if (zMaxFoundation == facetsFoundation[i].c.z) facetsFoundation[i].c.z = zMinModel - gap;
+				if (zMinFoundation == facetsFoundation[i].c.z) facetsFoundation[i].c.z = zMinModel - gap - height;
+			
+			}
+
+			for (const auto& facet : facetsModel)
+			{
+				resultFigure.add(facet);
+			}
+			for (const auto& facet : facetsFoundation)
+			{
+				resultFigure.add(facet);
+			}
+
+			return resultFigure;
+		}
+	}
 }
