@@ -21,6 +21,7 @@ namespace geom_utils
 
         FPoint3D a, b, c;
         FPoint3D getNormal() const;
+        void reverse() { std::swap(a, c); }
     };
 
 }

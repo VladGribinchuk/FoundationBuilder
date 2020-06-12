@@ -11,6 +11,7 @@ void Application::init(int argc, char** argv)
     cl.add(Option("BuildIn", "write result in one or two files", "b", true));
     cl.add(Option("OutputInASCII", "write result in Binary or ASCII files", "a", true));
     cl.add(Option("Help", "help info", "help", true));
+    cl.add(Option("InflateValue", "specifies how much wider will be foundation than input stl", "w", false, "5.0"));
 
     if (!cl.parse(argc, argv) || cl.specified("help"))
     {
@@ -24,6 +25,7 @@ void Application::init(int argc, char** argv)
     float height = cl.getValueAs<float>("Height");
     bool buildIn = cl.specified("b");
     bool fileType = cl.specified("a");
+    float inflateValue = cl.getValueAs<float>("InflateValue");
 }
 
 // Main logic of the application is here

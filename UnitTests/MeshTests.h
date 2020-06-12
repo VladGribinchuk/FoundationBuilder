@@ -1,6 +1,7 @@
 #pragma once
 #include "UnitTests.h"
 #include "../GeometryCore/include/Mesh.h"
+#include "../GeometryCore/include/AABB.h"
 
 using namespace geom_utils;
 
@@ -122,4 +123,39 @@ DEFINE_TEST_CASE(MeshWriteBinary)
         mesh[0].b.x == 0 && mesh[0].b.y == 1 && mesh[0].b.z == 0 &&
         mesh[0].c.x == 0 && mesh[0].c.y == 1 && mesh[0].c.z == -1
         ), "The written mesh is wrong!");
+}
+
+DEFINE_TEST_CASE(FoundationNormals)
+{
+    Mesh mesh;
+    mesh.read("../test_models/facets_155314.stl");
+    Mesh output_mesh = createFoundation(mesh, 6.00, 5.00);
+    auto facets = output_mesh.getFacets();
+    int i = 0;
+    TEST_ASSERT(facets[i].getNormal() == FPoint3D(0, 0, 1), "Normal of facets on top must be {0, 0, 1}");
+    int j = facets.size() - 1;
+    TEST_ASSERT(facets[j].getNormal() == FPoint3D(0, 0, -1), "Normal of facets on bottom must be {0, 0, -1}");
+}
+
+DEFINE_TEST_CASE(FoundationHeight)
+{
+    Mesh mesh;
+    mesh.read("../test_models/concave_outline_binary.stl");
+    Mesh output_mesh = createFoundation(mesh, 7.00, 5.00);
+    auto facets = output_mesh.getFacets();
+    int i = 0, j = facets.size() - 1;
+    TEST_ASSERT(facets[i].a.z - facets[j].a.z == 7.00, "Height of foundation must be 7.00");
+}
+
+DEFINE_TEST_CASE(FoundationInBox)
+{
+    Mesh mesh;
+    mesh.read("../test_models/cube_20x20x20_ascii.stl");
+    
+    Mesh output_mesh = createFoundation(mesh, 8.00, 5.00);
+    AABB3D box(FPoint3D(-15.001, -15.001, -0.001), FPoint3D(15.001, 15.001, 8.001));
+    
+    for (auto i : output_mesh.getFacets()) {
+        TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
+    }
 }
