@@ -189,7 +189,7 @@ namespace geom_utils
 		moveUp(foundationTop, foundationHeight);
 
 		Mesh foundation;
-		std::transform(polygonOfBottom.begin(), polygonOfBottom.end(), std::back_inserter(foundationBottom), &Triangle3D::reverse);
+		for_each(foundationBottom.begin(), foundationBottom.end(), [](Triangle3D& i) {i.reverse(); });
 		for (int i = 0; i < foundationBottom.size(); ++i) {
 			foundation.add(foundationTop[i]);
 
