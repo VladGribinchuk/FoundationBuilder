@@ -2,10 +2,12 @@
 
 #include "Point.h"
 
+
 namespace geom_utils
 {
     class Polygon;
     struct Triangle2D;
+    class Mesh;
 
     class AABB2D // Axis Aligned Boundary Box
     {
@@ -40,6 +42,7 @@ namespace geom_utils
 
     class AABB3D // Axis Aligned Boundary Box
     {
+
     public:
         FPoint3D pmin, pmax;
 
@@ -50,11 +53,14 @@ namespace geom_utils
         AABB3D(const FPoint3D& min, const FPoint3D& max)
             : pmin(min), pmax(max)
         {}
+        AABB3D(const Mesh&);
 
         FPoint3D min() const { return pmin; }
         FPoint3D max() const { return pmax; }
 
         // Return true if p is inside the AABB boundaries.
         bool contains(const FPoint3D& p) const;
+    private:
+        void calculate(const Mesh&);
     };
 }
