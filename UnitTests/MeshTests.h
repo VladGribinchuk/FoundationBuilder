@@ -2,6 +2,7 @@
 #include "UnitTests.h"
 #include "../GeometryCore/include/Mesh.h"
 #include "../GeometryCore/include/AABB.h"
+#include "../FoundationBuilder/include/FoundationFunctions.h"
 
 using namespace geom_utils;
 
@@ -93,16 +94,16 @@ DEFINE_TEST_CASE(MeshWriteASCII)
     Mesh mesh;
     mesh.add({ {1, 1, 0 }, {0, 1, 0}, {0, 1, -1} });
     mesh.setModelName("square_unit_test");
-	mesh.writeASCII("../test_models/square_unit_WriteTest_ascii.stl");
+    mesh.writeASCII("../test_models/square_unit_WriteTest_ascii.stl");
 
 
-	std::ifstream f("../test_models/square_unit_WriteTest_ascii.stl", std::ios::in);
-	std::stringstream ss;
-	ss << f.rdbuf();
-	f.close();
+    std::ifstream f("../test_models/square_unit_WriteTest_ascii.stl", std::ios::in);
+    std::stringstream ss;
+    ss << f.rdbuf();
+    f.close();
     std::remove("../test_models/square_unit_WriteTest_ascii.stl");
 
-	TEST_CHECK((ss).str(), 
+    TEST_CHECK((ss).str(), 
         std::string("solid square_unit_test\n facet normal -0 -1 0\n  outer loop\n  vertex 1 1 0\n  vertex 0 1 0\n  vertex 0 1 -1\n  endloop\n endfacet\n\nendsolid square_unit_test"), 
         "The written mesh is wrong!");
 }
@@ -125,50 +126,50 @@ DEFINE_TEST_CASE(MeshWriteBinary)
         ), "The written mesh is wrong!");
 }
 
-DEFINE_TEST_CASE(FoundationNormals)
-{
-    Mesh mesh;
-    mesh.read("../test_models/facets_155314.stl");
-    Mesh output_mesh = createFoundation(mesh, 6.00, 5.00);
-    auto facets = output_mesh.getFacets();
-    int i = 0;
-    TEST_ASSERT(facets[i].getNormal() == FPoint3D(0, 0, 1), "Normal of facets on top must be {0, 0, 1}");
-    int j = facets.size() - 1;
-    TEST_ASSERT(facets[j].getNormal() == FPoint3D(0, 0, -1), "Normal of facets on bottom must be {0, 0, -1}");
-}
-
-DEFINE_TEST_CASE(FoundationHeight)
-{
-    Mesh mesh;
-    mesh.read("../test_models/concave_outline_binary.stl");
-    Mesh output_mesh = createFoundation(mesh, 7.00, 5.00);
-    auto facets = output_mesh.getFacets();
-    int i = 0, j = facets.size() - 1;
-    TEST_ASSERT(facets[i].a.z - facets[j].a.z == 7.00, "Height of foundation must be 7.00");
-}
-
-DEFINE_TEST_CASE(FoundationInBox)
-{
-    Mesh mesh;
-    mesh.read("../test_models/cube_20x20x20_ascii.stl");
-    
-    Mesh output_mesh = createFoundation(mesh, 8.00, 5.00);
-    AABB3D box(FPoint3D(-15.001, -15.001, -0.001), FPoint3D(15.001, 15.001, 8.001));
-    
-    for (auto i : output_mesh.getFacets()) {
-        TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
-    }
-}
-
-DEFINE_TEST_CASE(PlacingFoundationUnderFigure)
-{
-    Mesh model;
-    model.read("../test_models/cube_20x20x20_ascii.stl");
-    Mesh fonundation = createFoundation(model, 4.00, 5.00);
-    Mesh out = integrateFoundationIntoModel(model,fonundation);
-
-    AABB3D box(FPoint3D(-15.001, -15.001, -5.001), FPoint3D(20.001, 20.001, 20.001));
-    for (auto i : out.getFacets()) {
-        TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
-    }
-}
+//DEFINE_TEST_CASE(FoundationNormals)
+//{
+//    Mesh mesh;
+//    mesh.read("../test_models/facets_155314.stl");
+//    Mesh output_mesh = createFoundation(mesh, 6.00, 5.00);
+//    auto facets = output_mesh.getFacets();
+//    int i = 0;
+//    TEST_ASSERT(facets[i].getNormal() == FPoint3D(0, 0, 1), "Normal of facets on top must be {0, 0, 1}");
+//    int j = facets.size() - 1;
+//    TEST_ASSERT(facets[j].getNormal() == FPoint3D(0, 0, -1), "Normal of facets on bottom must be {0, 0, -1}");
+//}
+//
+//DEFINE_TEST_CASE(FoundationHeight)
+//{
+//    Mesh mesh;
+//    mesh.read("../test_models/concave_outline_binary.stl");
+//    Mesh output_mesh = createFoundation(mesh, 7.00, 5.00);
+//    auto facets = output_mesh.getFacets();
+//    int i = 0, j = facets.size() - 1;
+//    TEST_ASSERT(facets[i].a.z - facets[j].a.z == 7.00, "Height of foundation must be 7.00");
+//}
+//
+//DEFINE_TEST_CASE(FoundationInBox)
+//{
+//    Mesh mesh;
+//    mesh.read("../test_models/cube_20x20x20_ascii.stl");
+//    
+//    Mesh output_mesh = createFoundation(mesh, 8.00, 5.00);
+//    AABB3D box(FPoint3D(-15.001, -15.001, -0.001), FPoint3D(15.001, 15.001, 8.001));
+//    
+//    for (auto i : output_mesh.getFacets()) {
+//        TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
+//    }
+//}
+//
+//DEFINE_TEST_CASE(PlacingFoundationUnderFigure)
+//{
+//    Mesh model;
+//    model.read("../test_models/cube_20x20x20_ascii.stl");
+//    Mesh fonundation = createFoundation(model, 4.00, 5.00);
+//    Mesh out = integrateFoundationIntoModel(model,fonundation);
+//
+//    AABB3D box(FPoint3D(-15.001, -15.001, -5.001), FPoint3D(20.001, 20.001, 20.001));
+//    for (auto i : out.getFacets()) {
+//        TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
+//    }
+//}

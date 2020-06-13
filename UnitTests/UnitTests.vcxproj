@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABBTest.h" />
+    <ClInclude Include="ApplicationTests.h" />
     <ClInclude Include="LinearAlgebraTests.h" />
     <ClInclude Include="MeshTests.h" />
     <ClInclude Include="PerformanceTests.h" />
