@@ -210,7 +210,7 @@ namespace geom_utils
 		}
 		return foundation;
 	}
-	Mesh integrateFoundationIntoModel(const Mesh& model, Mesh& foundation)
+	Mesh integrateFoundationIntoModel(const Mesh& model, Mesh foundation)
 	{
 		Mesh resultFigure;
 		if (!model.isEmpty() && !foundation.isEmpty())

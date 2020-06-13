@@ -56,7 +56,7 @@ namespace geom_utils
      * The foundation is placed under the figure with a gap
      *  - by default gap is equal to 0.5
      */
-    Mesh integrateFoundationIntoModel(const Mesh& model, Mesh& foundation);
+    Mesh integrateFoundationIntoModel(const Mesh& model, Mesh foundation);
 
     class MeshHandler
     {
