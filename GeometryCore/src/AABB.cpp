@@ -34,7 +34,8 @@ namespace geom_utils
 
     void AABB2D::calculate(const Polygon& poly)
     {
-        if (!poly.empty()) {
+        if (!poly.empty()) 
+        {
             auto maxX = std::max_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.x > a.x; }) - poly.begin();
             pmax.x = poly[maxX].x;
             auto maxY = std::max_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.y > a.y; }) - poly.begin();
@@ -54,7 +55,8 @@ namespace geom_utils
 
     void AABB3D::calculate(const Mesh& figure)
     { 
-        if (!figure.isEmpty()) {
+        if (!figure.isEmpty()) 
+        {
             std::vector <Triangle3D> facets(figure.getFacets());
             std::vector<FPoint3D::coord> valuesX;
             std::vector<FPoint3D::coord> valuesY;
@@ -74,14 +76,17 @@ namespace geom_utils
                 valuesZ.push_back(i.c.z);
             }
 
-            pmin.x = *std::min_element(valuesX.begin(), valuesX.end());
-            pmax.x = *std::max_element(valuesX.begin(), valuesX.end());
+            auto resultX = std::minmax_element(valuesX.begin(), valuesX.end());
+            pmin.x = *resultX.first;
+            pmax.x = *resultX.second;
 
-            pmin.y = *std::min_element(valuesY.begin(), valuesY.end());
-            pmax.y = *std::max_element(valuesY.begin(), valuesY.end());
+            auto resultY = std::minmax_element(valuesY.begin(), valuesY.end());
+            pmin.y = *resultY.first;
+            pmax.y = *resultY.second;
 
-            pmin.z = *std::min_element(valuesZ.begin(), valuesZ.end());
-            pmax.z = *std::max_element(valuesZ.begin(), valuesZ.end());
+            auto resultZ = std::minmax_element(valuesZ.begin(), valuesZ.end());
+            pmin.z = *resultZ.first;
+            pmax.z = *resultZ.second;
      
         }
         else

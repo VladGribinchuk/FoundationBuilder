@@ -60,7 +60,9 @@ namespace geom_utils
 
         // Return true if p is inside the AABB boundaries.
         bool contains(const FPoint3D& p) const;
+
     private:
+        // Calculate min, max based on given mesh.
         void calculate(const Mesh&);
     };
 }

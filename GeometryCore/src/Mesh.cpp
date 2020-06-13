@@ -210,19 +210,16 @@ namespace geom_utils
 		}
 		return foundation;
 	}
-	Mesh integrateFoundationIntoModel(const Mesh& model,const Mesh& foundation)
+	Mesh integrateFoundationIntoModel(const Mesh& model, Mesh& foundation)
 	{
 		Mesh resultFigure;
-		Mesh copyModel(model);
-		Mesh copyFoundation(foundation);
 		if (!model.isEmpty() && !foundation.isEmpty())
 		{
-			auto zDiff = copyModel.getAABB().pmin.z - copyFoundation.getAABB().pmax.z;
+			auto zDiff = model.getAABB().pmin.z - foundation.getAABB().pmax.z;
 			const float gap = 0.5;
 			zDiff -= gap;
-			copyFoundation.translate(FPoint3D(0, 0, zDiff));
-			resultFigure.merge(model);
-			resultFigure.merge(copyFoundation);
+			foundation.translate(FPoint3D(0, 0, zDiff));
+			resultFigure = model + foundation;
 		}
 		return resultFigure;
 	}
@@ -236,26 +233,32 @@ namespace geom_utils
 	}
 	void Mesh::translate(const FPoint3D& point)
 	{
-		for (int i = 0;i<facets.size();i++)
+		for (int i = 0; i < facets.size(); i++) 
 		{
-			facets[i].a.x += point.x;
-			facets[i].a.y += point.y;
-			facets[i].a.z += point.z;
-
-			facets[i].b.x += point.x;
-			facets[i].b.y += point.y;
-			facets[i].b.z += point.z;
-
-			facets[i].c.x += point.x;
-			facets[i].c.y += point.y;
-			facets[i].c.z += point.z;	
+			facets[i].a += point;
+			facets[i].b += point;
+			facets[i].c += point;
 		}
 	}
 
-	AABB3D Mesh::getAABB()
+	AABB3D Mesh::getAABB() const
 	{
 		AABB3D aabb(*this);
 		return aabb;
+	}
+
+	Mesh operator+(const Mesh& figure, const Mesh& figure2) 
+	{
+		Mesh resultFigure;
+		resultFigure.merge(figure);
+		resultFigure.merge(figure2);
+		return resultFigure;
+	}
+
+	Mesh operator+=(Mesh& figure, const Mesh& figure2)
+	{
+		figure.merge(figure2);
+		return figure;
 	}
 	
 }
