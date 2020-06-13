@@ -1,12 +1,18 @@
 #include "../include/AABB.h"
 #include "../include/Polygon.h"
 #include "../include/Triangle.h"
+#include "../include/Mesh.h"
 
 namespace geom_utils
 {
     AABB2D::AABB2D(const Polygon& poly)
     {
         calculate(poly);
+    }
+
+    AABB3D::AABB3D(const Mesh& figure)
+    {
+        calculate(figure);
     }
 
     AABB2D::AABB2D(const Triangle2D& tri)
@@ -28,7 +34,8 @@ namespace geom_utils
 
     void AABB2D::calculate(const Polygon& poly)
     {
-        if (!poly.empty()) {
+        if (!poly.empty()) 
+        {
             auto maxX = std::max_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.x > a.x; }) - poly.begin();
             pmax.x = poly[maxX].x;
             auto maxY = std::max_element(poly.begin(), poly.end(), [](auto a, auto b) {return b.y > a.y; }) - poly.begin();
@@ -44,6 +51,50 @@ namespace geom_utils
             pmax = (minPoint<FPoint2D>());
         }
         
+    }
+
+    void AABB3D::calculate(const Mesh& figure)
+    { 
+        if (!figure.isEmpty()) 
+        {
+            std::vector <Triangle3D> facets(figure.getFacets());
+            std::vector<FPoint3D::coord> valuesX;
+            std::vector<FPoint3D::coord> valuesY;
+            std::vector<FPoint3D::coord> valuesZ;
+            for (auto i : facets)
+            {
+                valuesX.push_back(i.a.x);
+                valuesX.push_back(i.b.y);
+                valuesX.push_back(i.c.z);
+
+                valuesY.push_back(i.a.x);
+                valuesY.push_back(i.b.y);
+                valuesY.push_back(i.c.z);
+
+                valuesZ.push_back(i.a.z);
+                valuesZ.push_back(i.b.z);
+                valuesZ.push_back(i.c.z);
+            }
+
+            auto resultX = std::minmax_element(valuesX.begin(), valuesX.end());
+            pmin.x = *resultX.first;
+            pmax.x = *resultX.second;
+
+            auto resultY = std::minmax_element(valuesY.begin(), valuesY.end());
+            pmin.y = *resultY.first;
+            pmax.y = *resultY.second;
+
+            auto resultZ = std::minmax_element(valuesZ.begin(), valuesZ.end());
+            pmin.z = *resultZ.first;
+            pmax.z = *resultZ.second;
+     
+        }
+        else
+        {
+            pmin = (maxPoint<FPoint3D>());
+            pmax = (minPoint<FPoint3D>());
+        }
+
     }
 
     bool AABB3D::contains(const FPoint3D& p) const

@@ -5,8 +5,10 @@
 #include <vector>
 #include <string>
 
+
 namespace geom_utils
 {
+    class AABB3D;
     class Mesh
     {
         std::vector<Triangle3D> facets;
@@ -29,9 +31,32 @@ namespace geom_utils
         bool read(const std::string& filepath);
         bool writeASCII(const std::string& filepath) const;
         bool writeBinary(const std::string& filepath) const;
+
+       
+        // Translate mesh to the given point
+        void translate(const FPoint3D& point);
+        //add facets to mesh object
+        void merge(const Mesh& figure);
+
+        AABB3D getAABB() const;
+
+        
+        
     };
 
+    Mesh operator+(const Mesh& figure, const Mesh& figure2);
+    Mesh operator+=(Mesh& figure, const Mesh& figure2);
+    
+
+
     Mesh createFoundation(const Mesh& inputModel, const FPoint3D::coord foundationHeight, const FPoint3D::coord inflateValue);
+    /*
+     * NOTE:Method works correctly only if there are two types z(z0,z1)
+     *
+     * The foundation is placed under the figure with a gap
+     *  - by default gap is equal to 0.5
+     */
+    Mesh integrateFoundationIntoModel(const Mesh& model, Mesh foundation);
 
     class MeshHandler
     {
