@@ -150,4 +150,7 @@ public:
 
 private:
     Application() {}
+
+    bool help; //true, if help is called
+    CommandLine cl;
 };
