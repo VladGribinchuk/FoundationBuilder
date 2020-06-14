@@ -1,5 +1,4 @@
 #include "../include/FoundationFunctions.h"
-
 #include <vector>
 
 
