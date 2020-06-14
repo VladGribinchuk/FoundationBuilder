@@ -5,7 +5,6 @@
 // Initialize with command line arguments
 void Application::init(int argc, char** argv)
 {
-    CommandLine cl;
     cl.add(Option("InputModel", "specifies a file path to input .stl", "i", false, "input.stl"));
     cl.add(Option("OutputModel", "specifies a file path to output .stl", "o", false, "output.stl"));
     cl.add(Option("MetaData", "specifies a file path to  metadate .json", "m", false, "metadate.json"));
@@ -22,13 +21,6 @@ void Application::init(int argc, char** argv)
         return;
     };
 
-    inputFilepath = cl.getValueAs<std::string>("InputModel");
-    outputFilepath = cl.getValueAs<std::string>("OutputModel");
-    metadataFilepath = cl.getValueAs<std::string>("MetaData");
-    height = cl.getValueAs<float>("Height");
-    isBuildIn = cl.specified("b");
-    isASCII = cl.specified("a");
-    inflateValue = cl.getValueAs<float>("InflateValue");
 }
 
 // Main logic of the application is here
@@ -36,28 +28,28 @@ void Application::init(int argc, char** argv)
 int Application::run()
 {
     if (help) return 0; //help was called, so other fields aren't initialized by user
-    if (height <= 0 || inflateValue <= 0 ||
-        inputFilepath.find(".stl", inputFilepath.length() - 4) == std::string::npos ||
-        outputFilepath.find(".stl", outputFilepath.length() - 4) == std::string::npos ||
-        metadataFilepath.find(".json", metadataFilepath.length() - 5) == std::string::npos) return -1; //some wrong input values
+    if (cl.getValueAs<float>("Height") <= 0 || cl.getValueAs<float>("InflateValue") <= 0 ||
+        cl.getValueAs<std::string>("InputModel").find(".stl", cl.getValueAs<std::string>("InputModel").length() - 4) == std::string::npos ||
+        cl.getValueAs<std::string>("OutputModel").find(".stl", cl.getValueAs<std::string>("OutputModel").length() - 4) == std::string::npos ||
+        cl.getValueAs<std::string>("MetaData").find(".json", cl.getValueAs<std::string>("MetaData").length() - 5) == std::string::npos) return -1; //some wrong input values
 
     //read the input model
     geom_utils::Mesh inputMesh;
-    if (!inputMesh.read(inputFilepath)) return -1;
+    if (!inputMesh.read(cl.getValueAs<std::string>("InputModel"))) return -1;
 
     //create a foundation for it
-    geom_utils::Mesh outputMesh = geom_utils::createFoundation(inputMesh, height, inflateValue);
+    geom_utils::Mesh outputMesh = geom_utils::createFoundation(inputMesh, cl.getValueAs<float>("Height"), cl.getValueAs<float>("InflateValue"));
 
     //unite the foundation and input figure in one .stl model, if it is stated
-    if (isBuildIn)
+    if (cl.specified("b"))
         outputMesh = geom_utils::integrateFoundationIntoModel(inputMesh, outputMesh);
 
     //write in ASCII or binary .STL file
-    if (isASCII) {
-        if (!outputMesh.writeASCII(outputFilepath)) return -1;
+    if (cl.specified("a")) {
+        if (!outputMesh.writeASCII(cl.getValueAs<std::string>("OutputModel"))) return -1;
     }
     else
-        if (!outputMesh.writeBinary(outputFilepath)) return -1;
+        if (!outputMesh.writeBinary(cl.getValueAs<std::string>("OutputModel"))) return -1;
 
     //create and write metadata for it
         //method is not written yet

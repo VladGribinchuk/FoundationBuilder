@@ -151,12 +151,6 @@ public:
 private:
     Application() {}
 
-    std::string inputFilepath; //path to input .STL model
-    std::string outputFilepath; //path to output .STL model
-    std::string metadataFilepath; //path to metadata
-    float height; //height of a foundation
-    float inflateValue; //value, which means how wider the foundation will be than .STL model
-    bool isBuildIn; //foundation and .STL model will be written in one file, if true
-    bool isASCII; //outout model will be written in ASCII file, if true
     bool help; //true, if help is called
+    CommandLine cl;
 };

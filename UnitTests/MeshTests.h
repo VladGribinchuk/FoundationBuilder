@@ -2,9 +2,7 @@
 #include "UnitTests.h"
 #include "../GeometryCore/include/Mesh.h"
 #include "../GeometryCore/include/AABB.h"
-#include "../FoundationBuilder/include/FoundationFunctions.h"
-#include <string>
-#include <fstream>
+
 
 using namespace geom_utils;
 
@@ -126,82 +124,4 @@ DEFINE_TEST_CASE(MeshWriteBinary)
         mesh[0].b.x == 0 && mesh[0].b.y == 1 && mesh[0].b.z == 0 &&
         mesh[0].c.x == 0 && mesh[0].c.y == 1 && mesh[0].c.z == -1
         ), "The written mesh is wrong!");
-}
-
-
-//function for copying files
-inline void copyFile(const std::string from, const std::string to)
-{
-    std::ifstream src(from, std::ios::binary);
-    std::ofstream dest(to, std::ios::binary);
-    dest << src.rdbuf();
-};
-
-
-DEFINE_TEST_CASE(FoundationNormals)
-{
-    copyFile("../x64/Debug/FoundationBuilder.exe", "FoundationBuilder.exe");
-    system("FoundationBuilder.exe -i ../test_models/facets_155314.stl -o ../test_models/outputModel.stl -h 6 -w 5 > unitTestFile.txt");
-    
-    Mesh mesh;
-    mesh.read("../test_models/outputModel.stl");
-    auto facets = mesh.getFacets();
-    TEST_ASSERT(facets[0].getNormal() == FPoint3D(0, 0, 1), "Normal of facets on top must be {0, 0, 1}");
-    TEST_ASSERT(facets[facets.size() - 1].getNormal() == FPoint3D(0, 0, -1), "Normal of facets on bottom must be {0, 0, -1}");
-    
-    std::remove("unitTestFile.txt");
-    std::remove("../test_models/outputModel.stl");
-    std::remove("FoundationBuilder.exe");
-}
-
-
-DEFINE_TEST_CASE(FoundationHeight)
-{
-    copyFile("../x64/Debug/FoundationBuilder.exe", "FoundationBuilder.exe");
-    system("FoundationBuilder.exe -i ../test_models/concave_outline_binary.stl -o ../test_models/outputModel.stl -h 7 -w 5 > unitTestFile.txt");
-
-    Mesh mesh;
-    mesh.read("../test_models/outputModel.stl");
-    auto facets = mesh.getFacets();
-    TEST_ASSERT(facets[0].a.z - facets[facets.size() - 1].a.z == 7.00, "Height of foundation must be 7.00");
-
-    std::remove("unitTestFile.txt");
-    std::remove("../test_models/outputModel.stl");
-    std::remove("FoundationBuilder.exe");
-}
-
-
-DEFINE_TEST_CASE(FoundationInBox)
-{
-    copyFile("../x64/Debug/FoundationBuilder.exe", "FoundationBuilder.exe");
-    system("FoundationBuilder.exe -i ../test_models/cube_20x20x20_ascii.stl -o ../test_models/outputModel.stl -h 8 -w 5 > unitTestFile.txt");
-
-    Mesh mesh;
-    mesh.read("../test_models/outputModel.stl");
-    AABB3D box(FPoint3D(-15.001, -15.001, -0.001), FPoint3D(15.001, 15.001, 8.001));
-    for (auto i : mesh.getFacets()) {
-        TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
-    }
-
-    std::remove("unitTestFile.txt");
-    std::remove("../test_models/outputModel.stl");
-    std::remove("FoundationBuilder.exe");
-}
-
-
-DEFINE_TEST_CASE(PlacingFoundationUnderFigure)
-{
-    copyFile("../x64/Debug/FoundationBuilder.exe", "FoundationBuilder.exe");
-    system("FoundationBuilder.exe -i ../test_models/cube_20x20x20_ascii.stl -o ../test_models/outputModel.stl -h 4 -w 5 -b > unitTestFile.txt");
-
-    Mesh model;
-    model.read("../test_models/outputModel.stl");
-    AABB3D box(FPoint3D(-15.001, -15.001, -5.001), FPoint3D(20.001, 20.001, 20.001));
-    for (auto i : model.getFacets()) {
-        TEST_ASSERT((box.contains(i.a) && box.contains(i.b) && box.contains(i.c)), "All points must be in Axis Aligned Boundary Box");
-    }
-
-    std::remove("unitTestFile.txt");
-    std::remove("../test_models/outputModel.stl");
-    std::remove("FoundationBuilder.exe");
 }
