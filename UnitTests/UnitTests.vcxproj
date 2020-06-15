@@ -87,6 +87,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,6 +147,14 @@
     <ClCompile Include="UnitTests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABBTest.h" />
+    <ClInclude Include="ApplicationTests.h" />
+    <ClInclude Include="LinearAlgebraTests.h" />
+    <ClInclude Include="MeshTests.h" />
+    <ClInclude Include="PerformanceTests.h" />
+    <ClInclude Include="PointTests.h" />
+    <ClInclude Include="PolygonTests.h" />
+    <ClInclude Include="TriangleTests.h" />
     <ClInclude Include="UnitTests.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -2,7 +2,7 @@
 
 namespace geom_utils
 {
-    enum class GeometryExecEnvironment
+    enum class [[deprecated("GeometryExecEnvironment is depricated and should not be used.")]] GeometryExecEnvironment
     {
         SINGLE_THREADED,
         MULTI_THREADED_OPENMP,
@@ -11,8 +11,8 @@ namespace geom_utils
 
     // SINGLE_THREADED by default.
     // Returns old environment value.
-    GeometryExecEnvironment setGeometryExecEnvironment(GeometryExecEnvironment newEnv);
+    [[deprecated("setGeometryExecEnvironment is depricated and should not be used.")]] GeometryExecEnvironment setGeometryExecEnvironment(GeometryExecEnvironment newEnv) {};
 
-    GeometryExecEnvironment getGeometryExecEnvironment();
+    [[deprecated("getGeometryExecEnvironment is depricated and should not be used.")]] GeometryExecEnvironment getGeometryExecEnvironment() { return {}; };
 
 } //namespace geom_utils

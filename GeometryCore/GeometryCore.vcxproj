@@ -87,6 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,11 +153,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AABB.cpp" />
-    <ClCompile Include="src\GeometryCoreExecEnvironment.cpp" />
     <ClCompile Include="src\LinearAlgebra.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Polygon.cpp" />
     <ClCompile Include="src\SVGWriter.cpp" />
+    <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\Units.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

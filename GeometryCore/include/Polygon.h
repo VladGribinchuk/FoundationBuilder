@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Point.h"
-
+#include <algorithm>
 #include <vector>
+#include <sstream>
+#include <iterator>
 
 namespace geom_utils
 {
@@ -14,6 +16,7 @@ namespace geom_utils
         // Polygon class should not contain any more additional data fields, only points.
         std::vector<FPoint2D> points;
     public:
+        typedef FPoint2D PointType;
         Polygon() = default;
 
         Polygon(std::initializer_list<FPoint2D> points)
@@ -27,6 +30,7 @@ namespace geom_utils
         Polygon& operator=(const Polygon& other)
         {
             points = other.points;
+            return *this;
         }
 
         Polygon(Polygon&& other) noexcept
@@ -36,9 +40,11 @@ namespace geom_utils
         Polygon& operator=(Polygon&& other) noexcept
         {
             points = std::move(other.points);
+            return *this;
         }
 
         void add(const FPoint2D& p) { points.push_back(p); }
+        void addRange(const std::vector<FPoint2D>& p) { std::copy(p.begin(), p.end(), std::back_inserter(points)); }
         void remove(unsigned index) { points.erase(points.begin() + index); }
         void clear() { points.clear(); }
 
@@ -71,9 +77,8 @@ namespace geom_utils
         // Translate polygon to the given point
         void translate(const FPoint2D& p);
 
-        // Remove line segments which are smaller than the provided smallestLineLength value.
-        // Result will recall smth like re-connecting points process.
-        void simplify(const FPoint2D::coord smallestLineLength);
+        //simplifies polygon based on Ramer–Douglas–Peucker algorithm
+        void simplify(const FPoint2D::coord epsilon);
 
         // Calculate and return convex hull for the polygon
         Polygon convexHull() const;
@@ -86,6 +91,68 @@ namespace geom_utils
         std::vector<Triangle2D> triangulate() const;
 
         static Polygon makePolygon(const Triangle2D& tri);
+
+        /*
+         * Method for offsetting polygon contour outward making it to be expanded by provided value.
+         * NOTE: works correctly only for convex polygon. May return improper results for non-convex.
+         * 
+         * Acute angles may create long narrow spikes, which can be clipped by cornerAllowanceMultiplier.
+         *  - by default it is equal to 1.1, which means 110% of inflating value threshold for expanded corners, that allows obtuse angles, but clips acute;
+         *  - minimal value is 0, which means 0% of inflating value; 
+         *  - lower multiplier means more aggressive clipping, larger multiplier means relaxing clipping policy.
+         */
+        Polygon inflate(const float value, const float cornerAllowanceMultiplier = 1.1) const;
+       
+    private:
+        // Builds a new curve with fever points
+        //The algorithm defines 'dissimilar' based on the maximum distance between the original curve and the simplified curve (i.e., the Hausdorff distance between the curves)
+        //Link - https://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm
+        void simplifyRamerDouglasPeucker(const std::vector<FPoint2D>& pointList, const FPoint2D::coord epsilon, std::vector<FPoint2D>& out);
+
     };
+
+    bool operator==(const Polygon& lhs, const Polygon& rhs);
+    bool operator!=(const Polygon& lhs, const Polygon& rhs);
+    // Polygon output/input operators
+
+    inline std::string PolygonToString(const Polygon& poly)
+    {
+        std::stringstream ss;
+        ss << "{ ";
+        if (!poly.empty())
+        {
+            auto it = poly.begin();
+            for (; it < poly.end(); ++it)
+                ss << *it << (it == std::prev(poly.end()) ? " " : "; ");
+        }
+        ss << "}";
+        return ss.str();
+    }
+
+    inline std::ostream& operator<<(std::ostream& os, const Polygon& poly)
+    {
+        os << PolygonToString(poly);
+        return os;
+    }
+
+    inline std::istream& operator>>(std::istream& is, Polygon& poly)
+    {
+        poly.clear();
+
+        char c;
+        while (is.get(c) && c != '{') {/*search for opening brace*/}
+
+        Polygon::PointType point;
+        while (is)
+        {
+            is >> point;
+            if (point != notAPoint<Polygon::PointType>())
+                poly.add(point);
+            while (is.get(c) && c != ';' && c != '}') { /*search for next point*/ }
+            if (c == '}') // closing brace was found, exit
+                break;
+        }
+        return is;
+    }
 
 }
