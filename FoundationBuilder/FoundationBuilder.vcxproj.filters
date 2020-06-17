@@ -19,12 +19,18 @@
     <ClCompile Include="src\FoundationFunctions.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\MetadataOutput.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\FoundationFunctions.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataOutput.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

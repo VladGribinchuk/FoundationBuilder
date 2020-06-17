@@ -146,10 +146,12 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\FoundationFunctions.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MetadataOutput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\FoundationFunctions.h" />
+    <ClInclude Include="include\MetadataOutput.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

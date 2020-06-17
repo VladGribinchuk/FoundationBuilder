@@ -27,22 +27,22 @@ DEFINE_TEST_CASE(ApplicationRun)
 
     //check whether help works correct
     system("FoundationBuilder.exe -help > ApplicationRun_test.txt");
-    TEST_ASSERT(!isFileExist("output.stl") && !isFileExist("metadate.json"), "Application must not create any files if help is stated!");
+    TEST_ASSERT(!isFileExist("output.stl") && !isFileExist("metadata.json"), "Application must not create any files if help is stated!");
     std::remove("ApplicationRun_test.txt");
 
     //check whether program works with random data
     system("FoundationBuilder.exe some random data > ApplicationRun_test.txt");
-    TEST_ASSERT(!isFileExist("output.stl") && !isFileExist("metadate.json"), "Application must not create any files if random data is stated!");
+    TEST_ASSERT(!isFileExist("output.stl") && !isFileExist("metadata.json"), "Application must not create any files if random data is stated!");
     std::remove("ApplicationRun_test.txt");
 
     //check whether program works with wrong data
     system("FoundationBuilder.exe -i blabla.txt -o alsoBlabla.txt -h -2 > ApplicationRun_test.txt");
-    TEST_ASSERT(!isFileExist("output.stl") && !isFileExist("metadate.json"), "Application must not create any files if wrong data is stated!");
+    TEST_ASSERT(!isFileExist("output.stl") && !isFileExist("metadata.json"), "Application must not create any files if wrong data is stated!");
     std::remove("ApplicationRun_test.txt");
 
     //check whether program works without data
     system("FoundationBuilder.exe > ApplicationRun_test.txt");
-    TEST_ASSERT(!isFileExist("output.stl") && !isFileExist("metadate.json"), "Application must not create any files if data is not stated!");
+    TEST_ASSERT(!isFileExist("output.stl") && !isFileExist("metadata.json"), "Application must not create any files if data is not stated!");
     std::remove("ApplicationRun_test.txt");
 
     //check whether program works with correct data (foundation is integrated)
@@ -71,6 +71,7 @@ DEFINE_TEST_CASE(ApplicationRun)
 
     //delete the copied executor
     std::remove("FoundationBuilder.exe");
+    std::remove("metadata.json");
 }
 
 
@@ -88,6 +89,7 @@ DEFINE_TEST_CASE(FoundationNormals)
     std::remove("unitTestFile.txt");
     std::remove("../test_models/outputModel.stl");
     std::remove("FoundationBuilder.exe");
+    std::remove("metadata.json");
 }
 
 
@@ -104,6 +106,7 @@ DEFINE_TEST_CASE(FoundationHeight)
     std::remove("unitTestFile.txt");
     std::remove("../test_models/outputModel.stl");
     std::remove("FoundationBuilder.exe");
+    std::remove("metadata.json");
 }
 
 
@@ -121,6 +124,7 @@ DEFINE_TEST_CASE(FoundationInBox)
 
     std::remove("unitTestFile.txt");
     std::remove("../test_models/outputModel.stl");
+    std::remove("metadata.json");
     std::remove("FoundationBuilder.exe");
 }
 
@@ -138,6 +142,29 @@ DEFINE_TEST_CASE(PlacingFoundationUnderFigure)
     }
 
     std::remove("unitTestFile.txt");
+    std::remove("metadata.json");
     std::remove("../test_models/outputModel.stl");
     std::remove("FoundationBuilder.exe");
+}
+
+DEFINE_TEST_CASE(CreatingMetadataFile)
+{
+    copyFile("../x64/Debug/FoundationBuilder.exe", "FoundationBuilder.exe");
+    system("FoundationBuilder.exe -i ../test_models/cube_20x20x20_ascii.stl -o ../test_models/outputModel.stl -h 4 -w 5 -b -m meta.json");
+    std::ifstream metadataFile;
+    metadataFile.open("meta.json");
+    TEST_ASSERT(metadataFile.is_open(), "Metadata file \"meta.json\" must be created");
+    metadataFile.close();
+    std::remove("FoundationBuilder.exe");
+    std::remove("../test_models/outputModel.stl");
+    std::remove("meta.json");
+
+    copyFile("../x64/Debug/FoundationBuilder.exe", "FoundationBuilder.exe");
+    system("FoundationBuilder.exe -i ../test_models/cube_20x20x20_ascii.stl -o ../test_models/outputModel.stl -h 4 -w 5 -b");
+    metadataFile.open("metadata.json");
+    TEST_ASSERT(metadataFile.is_open(), "Metadata file with default value \"metadata.json\" must be created");
+    metadataFile.close();
+    std::remove("FoundationBuilder.exe");
+    std::remove("metadata.json");
+    std::remove("../test_models/outputModel.stl");
 }
